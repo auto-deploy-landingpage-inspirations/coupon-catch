@@ -8,7 +8,7 @@ import { collection, onSnapshot } from "firebase/firestore";
   import { getFunctions } from 'firebase/functions';
   // Firebase Analytics
   import { getAnalytics } from "firebase/analytics";
-  import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+  import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
   // import { connectStorageEmulator } from "firebase/storage";
 
   
@@ -74,4 +74,6 @@ export const fetchReceiptsData = (userId: string, onReceiptsUpdated: (receipts: 
   return unsubscribe;
 };
 
-export {firebaseGetStorage, firebaseConfig, functions, db, analytics, auth, provider, signInWithPopup, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, GoogleAuthProvider, sendPasswordResetEmail, signOut };
+const storageRef = ref;
+
+export {firebaseGetStorage, firebaseConfig, functions, db, analytics, auth, provider, storageRef, deleteObject, signInWithPopup, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, GoogleAuthProvider, sendPasswordResetEmail, signOut };

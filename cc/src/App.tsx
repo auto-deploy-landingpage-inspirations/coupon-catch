@@ -55,31 +55,36 @@ const App: React.FC = () => {
     // Using useEffect hook to set up authentication state listener
     useEffect(() => {
       let unsubscribeFromReceipts: () => void;
-
-      const unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
-        UserStore.update(s => {
-          s.isAuthed = !!firebaseUser;
-          s.user = firebaseUser;
-          s.uid = firebaseUser?.uid || null;
-          s.authChecked = true;
-        });
   
-        if (firebaseUser) {
-          unsubscribeFromReceipts = fetchReceiptsData(firebaseUser.uid, (receiptsData) => {
-            UserStore.update(s => {
-              s.receipts = receiptsData;
-            });
+      const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
+          let idToken = '';
+          if (firebaseUser) {
+              // Retrieve the ID token
+              idToken = await firebaseUser.getIdToken();
+              unsubscribeFromReceipts = fetchReceiptsData(firebaseUser.uid, (receiptsData) => {
+                  UserStore.update(s => {
+                      s.receipts = receiptsData;
+                  });
+              });
+          } else if (unsubscribeFromReceipts) {
+              unsubscribeFromReceipts();
+          }
+  
+          UserStore.update(s => {
+              s.isAuthed = !!firebaseUser;
+              s.user = firebaseUser;
+              s.uid = firebaseUser?.uid || null;
+              s.authChecked = true;
+              s.idToken = idToken; // Store the ID token in the state
           });
-        } else if (unsubscribeFromReceipts) {
-          unsubscribeFromReceipts();
-        }
       });
   
       return () => {
-        unsubscribeAuth();
-        if (unsubscribeFromReceipts) unsubscribeFromReceipts();
+          if (unsubscribeAuth) unsubscribeAuth();
+          if (unsubscribeFromReceipts) unsubscribeFromReceipts();
       };
-    }, []);
+  }, []);
+  
 
         // Construct the path to the user's receipts collection
         const collectionPath = `receipts/${uid}/extractedText`;

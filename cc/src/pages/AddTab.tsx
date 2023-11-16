@@ -47,6 +47,7 @@ import { UserStore } from "../utils/store";
 
 const AddTab: React.FC = () => {
   const uid = UserStore.useState(s => s.uid);
+  const idToken = UserStore.useState(s => s.idToken);
   const { takePhoto } = usePhotoGallery();
   const [toast, setToast] = useState({ 
     isOpen: false, 
@@ -78,20 +79,51 @@ const AddTab: React.FC = () => {
         console.log("Blob:", blob);
       }
       
+      // Step 2: Prepare FormData for upload
+      const formData = new FormData();
+      formData.append('image', blob, 'upload.jpg'); 
+
+      // Step 3: Upload to your server
+      const response = await fetch('http://localhost:3000/upload', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'Authorization': `Bearer ${idToken}`
+        }
+      });
+      if (response.ok) {
+          const result = await response.text(); // or response.json() if your server responds with JSON
+          console.log("Upload successful:", result);
+          setToast({ isOpen: true, message: 'Image successfully uploaded!', color: 'success' });
+      } else {
+          console.error("Upload failed:", response.statusText);
+          // Handle upload failure
+      }
+    } catch (error) {
+        console.error("Error in handleTakePhoto:", error);
+        // Handle the error
+    }
+};
+
+
+
+
+
+
         // Generate a date-time string using native JavaScript
-      const now = new Date();
-      const dateTimeString = now.toISOString().replace(/:/g, '_').replace(/\..+/, '');
-      const fileType = blob.type.split("/")[1]; // Extract file type (e.g., "jpeg", "png")
+      // const now = new Date();
+      // const dateTimeString = now.toISOString().replace(/:/g, '_').replace(/\..+/, '');
+      // const fileType = blob.type.split("/")[1]; // Extract file type (e.g., "jpeg", "png")
 
       // Define the path in Firebase Storage where the photo will be stored
-      const path = `uploadedReceipts/${uid}/${dateTimeString}.${fileType}`;
+      // const path = `uploadedReceipts/${uid}/${dateTimeString}.${fileType}`;
 
-      // Step 3: Upload the blob to Firebase Storage
-      const downloadURL = await uploadPhotoToFirebase(blob, path);
-      console.log("File available at", downloadURL);
+      // // Step 3: Upload the blob to Firebase Storage
+      // const downloadURL = await uploadPhotoToFirebase(blob, path);
+      // console.log("File available at", downloadURL);
 
       // Display success or handle additional tasks
-      setToast({ isOpen: true, message: 'Image successfully uploaded!', color: 'success' });
+      // setToast({ isOpen: true, message: 'Image successfully uploaded!', color: 'success' });
 
 
     // Step 3: Send the image to the HTTP endpoint
@@ -141,11 +173,11 @@ const AddTab: React.FC = () => {
     // }
     // console.log("Response from processImage:", processImageResponse);
 
-  } catch (err) {
-    console.error("Error in the process:", err);
-    setToast({ isOpen: true, message: 'Failed to upload and process the image', color: 'danger' });
-  }
-};
+//   } catch (err) {
+//     console.error("Error in the process:", err);
+//     setToast({ isOpen: true, message: 'Failed to upload and process the image', color: 'danger' });
+//   }
+// };
 
   return (
     <IonPage>

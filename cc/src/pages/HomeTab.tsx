@@ -23,14 +23,14 @@ import NoRecieptsComponent from "../components/NoRecieptsComponent";
 import RecieptDetailPage from "./ReceiptDetailPage";
 import { useHistory } from "react-router-dom";
 import { UserStore } from "../utils/store";
-import { db } from "../utils/firebaseConfig";
+import { db, deleteObject, storageRef } from "../utils/firebaseConfig";
 import { doc, deleteDoc } from "firebase/firestore";
 
 // await deleteDoc(doc(db, "cities", "DC"));
 const HomeTab: React.FC = () => {
   const history = useHistory();
   const receipts = UserStore.useState((s) => s.receipts);
-
+  const uid = UserStore.useState(s => s.uid);
 
   // useEffect(() => {
 
@@ -58,8 +58,42 @@ const HomeTab: React.FC = () => {
       return differenceInDays > 30;
     };
 
-    const handleDeleteReceipt = (receiptId: string) => { 
+    const handleDeleteReceipt = async (receiptId: string) => {
+      try {
+        // Check if uid is not null or undefined
+        if (!uid) {
+          console.error("User UID is null or undefined");
+          return; // Exit the function if uid is not available
+        }
+        // Path to the receipt document in Firestore
+        const receiptRef = doc(db, "receipts", uid, "extractedText", receiptId);
+    
+        // Delete the document
+        await deleteDoc(receiptRef);
+    
+        // Optional: Update local state or show confirmation to the user
+        // You can remove the receipt from the 'receipts' state or use another state management method to reflect the change
+        // For example, using UserStore to update the receipts list
+        UserStore.update(s => { s.receipts = s.receipts.filter(r => r.id !== receiptId) });
+    
+        // Need to delete receipt from firebase storage where its stored in uploadedReceipts/uid folder
+        const storageRefPath: any = `uploadedReceipts/${uid}/${receiptId}`;
 
+        // Delete the file
+        deleteObject(storageRefPath).then(() => {
+          // File deleted successfully
+          console.log("File deleted successfully");
+        }).catch((error) => {
+          // Uh-oh, an error occurred!
+          console.log("error deleting storage object")
+        });
+
+        // Show a toast or alert to confirm deletion
+        // ...
+      } catch (error) {
+        console.error("Error deleting receipt:", error);
+        // Handle any errors, such as showing an error message to the user
+      }
     }
     
 

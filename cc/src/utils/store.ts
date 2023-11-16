@@ -6,6 +6,7 @@ interface IAuthStore {
   receipts: any[];
   user: any;
   uid: string | null;
+  idToken: string | null;
 }
 
 export const UserStore = new Store<IAuthStore>({
@@ -14,6 +15,7 @@ export const UserStore = new Store<IAuthStore>({
     receipts: [],
     user: null,
     uid: null,
+    idToken: null,
 });
 
 interface IUploadInfo {
