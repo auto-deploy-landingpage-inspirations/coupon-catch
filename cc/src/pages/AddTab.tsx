@@ -84,13 +84,15 @@ const AddTab: React.FC = () => {
       formData.append('image', blob, 'upload.jpg'); 
 
       // Step 3: Upload to your server
+      const headers = new Headers();
+      headers.set('Authorization', `Bearer ${idToken}`);
+
       const response = await fetch('http://localhost:3000/upload', {
         method: 'POST',
         body: formData,
-        headers: {
-            'Authorization': `Bearer ${idToken}`
-        }
+        headers: headers,
       });
+
       if (response.ok) {
           const result = await response.text(); // or response.json() if your server responds with JSON
           console.log("Upload successful:", result);

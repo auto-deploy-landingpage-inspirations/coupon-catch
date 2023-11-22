@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "couponcatch-e211e",
+  "private_key_id": "58de1a9f6bfb5aa24a632bfbd3c1d54341a1a453",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC3jflGgAKbkFEl\n+98uH3TM84HCjrKTvmZiePVbJvO80wq9Mx5SiiXSKHzhQ5dsBv+S7eYUj8BJ999J\nTrCASevn/YFRhHrpNpwf13pWvtFxmhF9xGMaFxEcBmkUOSaIvDypi0b2f/5+yhnH\nJQnQB153P7/shLhR78J9hIUGOD30HIoT+DCiw6STPRQSMr+AVZJ+DaW7zs8wS+VE\nXyg26pJ6F6C+J9BIDeDZ9c/Xx0cVCqrGNlZxV/ir9j4iV11aWn4Cd6jUJeZTYSPt\nctutNFtevOSfegwHJEbamEI2v7wZ6CFT0ruiYi/awKOmluV63BMLWl5DXyHON+R1\nXqLIeCFVAgMBAAECggEAK4pKJdrCI5gPY7j0Fwr/qAkgD+BNBGZO/49NNhbOjM0r\n2Dbqu64I7CnN+5pOriGX2MjFQb3aoUEirk8z526Bfsl/tjA8fpsFXDk/DBod8PpY\nqVJfJqZvmMv9e35WAWvTYO1IgzrXycgTZs2GnxnMYvGUi1xtI4SByEfZzSCks4V1\nGS8GeAk387ipe1/zRhylrWH2K1a5OQB/gu9er5G343nhyXlNabegFfdLl2SG+clp\nGhzxHjbw/xwJRu6IJi0l3EWfh1DdqUadG+tfMKTZjGkNhSnW9eglbbsTdy1i6VeE\n3i7v3NaiPnnSrdbqSPqdHxsOTc/XVPhK0NELax6T0QKBgQDxsX7HgrZbKKMklJVh\noKRQ0P7uy0iFXOlfbwdFPkmg/h0gl5LgafnOZI9f7Ks4EbtnuhvWLlqfHZzWBLYW\nxVvTdhbeCcXDEqzmdcQa8UPb85gh5YrcVyym9l2e6vbdB/rTKWnTEhOpZLJvH4sc\noN0OuVEVrkG3tsdKSkk8p+JjMQKBgQDCa3jDBCtXF/tbr5Hvj5qZx+fOG8hLFwrK\ntbtS4aIkWnd+NK9LjNO3VYRRCefx+btEF7M2gVOUGwGM2vXSoGsZoaAmbd73gjDd\nNc37UjrJrK7DhXvDa/RkM/ClZDd3Ph5kPbzWqs2UPRGKms414GQu9q8SYb34bGkE\nseWzdMEvZQKBgBBApkzWPlr87ZONJkptWf9RPoNiShslt0/CkJOYb60SyXSinK7Y\nkYLOglGqAY2Aq8B65FpPvapLfHtrz67SUK10mG8P6yuF+vh4XNqO9Mg6pjVJUUAl\n4IvNr1f7ZuRQIA7JDyOxaH8QlWshjOI88wCFd61kjWjEMryNKEWa6H9RAoGBAI3x\nuTFokdv8fl/qRzoINm+gK/WnAw0PvalSFXnlkmPISQWzoWgfYVOw8/HWsalRExAb\n3ZQlx8eSEAeutVsaFBeakTp9bRR30QUwizq6RoGHufC2PC3pW3ztDv0xte0xRS8a\nhAyWl5FrJKt1aqibM4m2QQvCoNgHDoWG/JWQ4JqhAoGAAWydnCeVASVkeOXirREc\nKfblmvPX91BcGogPMGvalXecNgErboaFbzAQztyYysMNLVt5fD/di59o9FlOUUY4\nDJQGgKlPTG0ggLfzLMD51puH/GFOIesZUM65uprXm0aARykUNEVjQXdTX+8wcy0l\njBWYHsuo8lLMVsbrSnWmDjU=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-zg9au@couponcatch-e211e.iam.gserviceaccount.com",
+  "client_id": "102667358757448488895",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-zg9au%40couponcatch-e211e.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

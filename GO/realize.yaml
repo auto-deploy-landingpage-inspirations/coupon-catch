@@ -1,0 +1,22 @@
+settings:
+  legacy:
+    force: false
+    interval: 0s
+schema:
+- name: my-app
+  path: .
+  commands:
+    install:
+      status: true
+    run:
+      status: true
+  watcher:
+    paths:
+    - /
+    extensions:
+    - go
+    exclude:
+      paths:
+      - .git
+      - .realize
+      - vendor

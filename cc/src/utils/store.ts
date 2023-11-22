@@ -5,7 +5,7 @@ interface IAuthStore {
   isAuthed: boolean;
   receipts: any[];
   user: any;
-  uid: string | null;
+  uid: string;
   idToken: string | null;
 }
 
@@ -14,7 +14,7 @@ export const UserStore = new Store<IAuthStore>({
     isAuthed: false,
     receipts: [],
     user: null,
-    uid: null,
+    uid: '',
     idToken: null,
 });
 
