@@ -28,6 +28,6 @@ yarn-error.log*
 # Optional eslint cache
 .eslintcache
 
-/adtodb/node_modules
-/adtodb/package-lock.json
-/backend/node_modules
+adtodb/node_modules
+adtodb/package-lock.json
+backend/node_modules
