@@ -1,6 +1,9 @@
 import {
   IonActionSheet,
   IonAlert,
+  IonBadge,
+  IonButton,
+  IonChip,
   IonContent,
   IonHeader,
   IonIcon,
@@ -10,133 +13,298 @@ import {
   IonLabel,
   IonList,
   IonPage,
+  IonSpinner,
   IonText,
   IonTitle,
   IonToast,
   IonToggle,
   IonToolbar,
+  ToggleCustomEvent,
 } from "@ionic/react";
 import "../styles/AccountTabStyles.css";
-import { person } from "ionicons/icons";
-import { auth, signOut } from "../utils/firebaseConfig";
-import { useHistory } from 'react-router-dom';
-import { useState } from "react";
-import { UserStore } from "../utils/store";
+import { person, mail } from "ionicons/icons";
+import { auth, signOut, sendEmailVerification} from "../utils/fbAuth"
+import { useHistory } from "react-router-dom";
+import { useState, ReactNode } from "react";
+import { AuthStore } from "../utils/store";
 import { useEffect } from "react";
+import DemoUINotice from "../components/DemoUINotice";
+import { UserInfoStore } from "../utils/store";
+import { UserInfo } from "firebase-admin/lib/auth/user-record";
+import CountUp from "react-countup";
+import AmountSaved from "../components/AmountSaved";
+
+interface IButtonContentProps {
+  loadingFor: string;
+  buttonName: string;
+  children: ReactNode;
+}
 
 const AccountTab: React.FC = () => {
+  const [activeChip, setActiveChip] = useState("month"); // Default active chip
+  const darkModeEnabled = UserInfoStore.useState((s) => s.prefersDarkMode);
   const history = useHistory();
+  // const darkModeEnabled = AuthStore.useState(s => s.darkModeEnabled);
+  const user = AuthStore.useState((s) => s.user);
+
   const [showActionSheet, setShowActionSheet] = useState(false);
   // toastr state to display toast messages
-  const [toast, setToast] = useState({ 
-    isOpen: false, 
-    message: '', 
-    color: '' 
+  const [toast, setToast] = useState({
+    isOpen: false,
+    message: "",
+    color: "",
   });
-  const user = UserStore.useState(s => s.user);
 
+  // ButtonContent component to show either the buttonName label or a loading spinner depending on the loadingFor state
+  const ButtonContent: React.FC<IButtonContentProps> = ({
+    loadingFor,
+    buttonName,
+    children,
+  }) => {
+    return loadingFor === buttonName ? <IonSpinner name="bubbles" /> : children;
+  };
+
+  const [loadingFor, setLoadingFor] = useState("");
+
+  const toggleDarkMode = (ev: ToggleCustomEvent) => {
+    // Update darkModeEnabled in AuthStore
+    UserInfoStore.update((s) => {
+      s.prefersDarkMode = ev.detail.checked;
+    });
+    // Apply the theme based on the updated state
+    toggleDarkTheme(ev.detail.checked);
+  };
+
+  // Add or remove the "dark" class on the document body
+  const toggleDarkTheme = (shouldAdd: boolean) => {
+    document.body.classList.toggle("dark", shouldAdd);
+  };
+
+  useEffect(() => {
+    toggleDarkTheme(darkModeEnabled);
+  }, [darkModeEnabled]); // Re-run the effect when darkModeEnabled changes
+
+  // Function to resend the email verification link
+  const handleResendEmail = async () => {
+    setLoadingFor("resendEmail");
+    if (!auth.currentUser) {
+      // Handle the case when there is no user logged in
+      setToast({ isOpen: true, message: "No user logged in", color: "danger" });
+      setLoadingFor("");
+      return;
+    }
+
+    try {
+      await sendEmailVerification(auth.currentUser)
+        .then(() => {
+          // Email verification link sent
+          setToast({
+            isOpen: true,
+            message: "Verification email sent",
+            color: "success",
+          });
+        })
+        .catch((error: any) => {
+          // Error occurred
+          console.error("Error sending email verification:", error);
+          setToast({
+            isOpen: true,
+            message: "Error sending verification email",
+            color: "danger",
+          });
+        });
+    } catch (error) {
+      console.error("Error sending email verification:", error);
+      setToast({
+        isOpen: true,
+        message: "Error sending verification email",
+        color: "danger",
+      });
+    } finally {
+      setLoadingFor("");
+    }
+  };
 
   const handleSignOut = () => {
-    signOut(auth).then(() => {
-      console.log('Sign-out successful.');
-      UserStore.update(s => { s.isAuthed = false; });
-      // Navigate to /auth route upon successful signout
-      history.push('/auth');
-      setToast({ isOpen: true, message: 'Successfully logged out', color: 'success' });
-    }).catch((error) => {
-      console.error('An error happened during sign out:', error);
-      setToast({ isOpen: true, message: 'Error signing out', color: 'danger' });
-    });
+    signOut(auth)
+      .then(() => {
+        console.log("Sign-out successful.");
+        // // Navigate to /auth route upon successful signout
+        // history.push('/auth');
+        setToast({
+          isOpen: true,
+          message: "Successfully logged out",
+          color: "success",
+        });
+      })
+      .catch((error) => {
+        console.error("An error happened during sign out:", error);
+        setToast({
+          isOpen: true,
+          message: "Error signing out",
+          color: "danger",
+        });
+      });
+  };
+
+  const handleEditAccountInfo = () => {
+    history.push("/dashboard/account/edit-profile");
+  };
+  console.log("AccountTab loaded");
+
+  const handleChipClick = (chip: string) => {
+    setActiveChip(chip);
   };
 
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Account settings</IonTitle>
+          <IonTitle>Account Settings</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Account settings</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+        <AmountSaved 
+          monthAmount={34.10}
+          yearAmount={156.34}
+          allTimeAmount={210.80}
+        />
+
+        {/* // Custom divider line color matched */}
+        <hr style={{ border: 'none', height: '1px', backgroundColor: '#c8c7cc', margin: '0' }} />
+
         <IonList>
-          {/* User Profile basic info, avatar, etc */}
-          <IonItem>
-            <IonIcon aria-hidden="true" icon={person} slot="start"></IonIcon>
-            <IonLabel>
-              <h1>User name</h1>
-              <p>{user.email}</p>
+          {/* <IonItem>
+            <IonLabel slot="end">
+              
+              <IonChip
+              className="chip-style"
+                onClick={() => handleChipClick("month")}
+                outline={activeChip !== "month"}
+              >
+                month
+              </IonChip>
+              <IonChip
+              className="chip-style"
+                onClick={() => handleChipClick("year")}
+                outline={activeChip !== "year"}
+              >
+                year
+              </IonChip>
+              <IonChip
+              className="chip-style"
+                onClick={() => handleChipClick("all-time")}
+                outline={activeChip !== "all-time"}
+              >
+                all-time
+              </IonChip>
             </IonLabel>
-          </IonItem>
+          </IonItem> */}
 
           <IonItemGroup>
-            <IonItemDivider>
-              <IonLabel>Device settings</IonLabel>
-            </IonItemDivider>
-
+            <IonList>
+              {/* User Profile basic info, avatar, etc */}
+              <IonItem>
+                <IonIcon
+                  aria-hidden="true"
+                  icon={person}
+                  slot="start"
+                ></IonIcon>
+                <IonLabel>
+                  <h1>{user.displayName}</h1>
+                </IonLabel>
+                <IonLabel>
+                  {user.emailVerified === false && (
+                    <IonBadge color="warning" slot="end">
+                      Email unverified
+                    </IonBadge>
+                  )}
+                </IonLabel>
+              </IonItem>
+            </IonList>
             <IonItem>
-              <IonToggle>
-                <IonLabel>Dark mode</IonLabel>
+              <IonToggle checked={darkModeEnabled} onIonChange={toggleDarkMode}>
+                <IonLabel>
+                  <h2>Dark mode</h2>
+                </IonLabel>
               </IonToggle>
             </IonItem>
           </IonItemGroup>
 
           <IonItemGroup>
-            <IonItemDivider>
-              <IonLabel>Account settings</IonLabel>
-            </IonItemDivider>
+            {user.emailVerified === false && (
+              <IonItem>
+                <IonLabel>
+                  <h2>Email Unverified</h2>
+                </IonLabel>
+                <IonButton onClick={handleResendEmail}>
+                  <ButtonContent
+                    loadingFor={loadingFor}
+                    buttonName="resendEmail"
+                  >
+                    Resend
+                  </ButtonContent>
 
-            <IonItem button detail={true}>
-              <IonLabel>Forgot Password</IonLabel>
+                  <IonIcon slot="end" icon={mail}></IonIcon>
+                </IonButton>
+              </IonItem>
+            )}
+            <IonItem button detail={true} onClick={handleEditAccountInfo}>
+              <IonLabel>
+                <h2>Edit account info</h2>
+              </IonLabel>
             </IonItem>
 
             <IonItem>
-              <IonLabel>Delete account</IonLabel>
-            </IonItem>
-
-            <IonItem>
-              <IonLabel>Payment settings</IonLabel>
+              <IonLabel>
+                <h2>Payment somwrhing?</h2>
+              </IonLabel>
             </IonItem>
           </IonItemGroup>
 
-          <IonItem button detail={true} onClick={() => setShowActionSheet(true)}>
-          <IonLabel>
-            <IonText color="danger">Sign out</IonText>
-          </IonLabel>
-        </IonItem>
-
+          <IonItem
+            button
+            detail={true}
+            onClick={() => setShowActionSheet(true)}
+          >
+            <IonLabel>
+              <IonText color="danger">
+                <h2>Sign out</h2>
+              </IonText>
+            </IonLabel>
+          </IonItem>
         </IonList>
 
-
         <IonActionSheet
-  isOpen={showActionSheet}
-  onDidDismiss={() => setShowActionSheet(false)}
-  header="Are you sure you wish to sign out?"
-  buttons={[
-    {
-      text: 'Cancel',
-      role: 'cancel',
-    },
-    {
-      text: 'Sign Out',
-      role: 'destructive',
-      handler: () => {
-        handleSignOut();
-      }
-    }
-  ]}
-      />
-              <IonToast
-        isOpen={toast.isOpen}
-        onDidDismiss={() => setToast({ ...toast, isOpen: false })}
-        message={toast.message}
-        duration={3000}
-        color={toast.color}
-      />
+          isOpen={showActionSheet}
+          onDidDismiss={() => setShowActionSheet(false)}
+          header="Are you sure you wish to sign out?"
+          buttons={[
+            {
+              text: "Cancel",
+              role: "cancel",
+            },
+            {
+              text: "Sign Out",
+              role: "destructive",
+              handler: () => {
+                handleSignOut();
+              },
+            },
+          ]}
+        />
+        <IonToast
+          isOpen={toast.isOpen}
+          onDidDismiss={() => setToast({ ...toast, isOpen: false })}
+          message={toast.message}
+          duration={3000}
+          color={toast.color}
+          position="bottom"
+          positionAnchor="tab-bar"
+        />
 
+        {/* Include the DemoAccountNotice component */}
+        <DemoUINotice uid={user.uid} />
       </IonContent>
     </IonPage>
   );

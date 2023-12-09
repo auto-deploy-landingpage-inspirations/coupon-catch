@@ -3,9 +3,11 @@ import {
   IonButtons,
   IonContent,
   IonHeader,
+  IonIcon,
   IonImg,
   IonInput,
   IonItem,
+  IonLabel,
   IonModal,
   IonRouterLink,
   IonSpinner,
@@ -18,9 +20,11 @@ import { OverlayEventDetail } from "@ionic/core/components";
 import React, { ReactNode, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import "../styles/SignUpComponentStyles.css";
-
+import { GoogleAuthProvider, signInWithPopup } from "@firebase/auth";
 import { LoginOrSignupStore } from '../utils/store';
-import { auth, createUserWithEmailAndPassword } from "../utils/firebaseConfig";
+import { auth, createUserWithEmailAndPassword, updateProfile } from "../utils/fbAuth";
+import { download } from "ionicons/icons";
+import TermsModal from "./TermsModal";
 
 // Required interface for ButtonContent component
 interface IButtonContentProps {
@@ -34,7 +38,11 @@ interface IButtonContentProps {
     return loadingFor === buttonName ? <IonSpinner name="bubbles"/> : children;
   };
 
-const SignUpPage: React.FC = () => {
+  interface SignUpComponentProps {
+    toggleLogin: () => void;
+  }
+
+const SignUpPage: React.FC<SignUpComponentProps> = ({ toggleLogin }) => {
   // loadingFor state to track which button is loading
   const [loadingFor, setLoadingFor] = useState('');
   // toastr state to display toast messages
@@ -44,8 +52,6 @@ const SignUpPage: React.FC = () => {
     color: '' 
   });
   const [showTermsModal, setShowTermsModal] = useState(false);
-
-
 
   // EMAIL FIELD
   // State to track if the email input has been touched/interacted with by the user
@@ -62,12 +68,25 @@ const SignUpPage: React.FC = () => {
   const [isPasswordValid, setIsPasswordValid] = useState<boolean | undefined>();
   // State to track passwordField as entered by user
   const [passwordField, setPasswordField] = useState<string>("");
-  // State to track whether the repeatpassword should be shown or not
-  const [showRepeatPasswordField, setShowRepeatPasswordField] =
-    useState<boolean>(false);
+  // // State to track whether the repeatpassword should be shown or not
+  // const [showRepeatPasswordField, setShowRepeatPasswordField] =
+  //   useState<boolean>(false);
+  // State to track whether the displayName should be shown or not
+  const [showDisplayNameField, setShowDisplayNameField] =
+  useState<boolean>(false);
+
+  // DISPLAYNAME FIELD
+  // State to track if the displayName input has been touched/interacted with by the user
+  const [isDisplayNameTouched, setIsDisplayNameTouched] = useState(false);
+  // State to track if the displayName input value is valid or not
+  const [isDisplayNameValid, setIsDisplayNameValid] = useState<boolean | undefined>();
+  // State to track displayNameField as entered by user
+  const [displayNameField, setDisplayNameField] = useState<string>("");
+
 
   const isEmail = (email: string) =>
     /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
+
   // onIonInput provides an Event object, from which the value is used to set the state of the email field useState value
   const handleEmailInput = (ev: Event) => {
     const value = (ev.target as HTMLInputElement).value;
@@ -81,13 +100,10 @@ const SignUpPage: React.FC = () => {
     isEmail(value) ? setIsEmailValid(true) : setIsEmailValid(false);
   };
 
-    // MODAL
-    // Modal for terms modal with download
-    const modal = useRef<HTMLIonModalElement>(null);
-    // Modal download for terms and conditions function
-    function download() {
-      // download link for pdf of terms and conditions
+    function handleDownloadTandCPDF() {
+      // download link for pdf of terms and conditions stored in "../../public/CCTermsandConditions.pdf"
     };
+
     // Allows Modal to be closed?
     function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
       if (ev.detail.role === "confirm") {
@@ -101,10 +117,10 @@ const SignUpPage: React.FC = () => {
     setPasswordField(value);
     // Resetting isPasswordValid state to undefined (initial state)
     setIsPasswordValid(undefined);
-    // If the user hasn't entered anything, exit the function. If the user has enetered anything, set the state using setShowRepeatPasswordField to true to display the repeat password field
+    // If the user hasn't entered anything, exit the function. If the user has enetered anything, set the state using setShowDisplayNameField to true to display the repeat password field
     value === ""
-      ? setShowRepeatPasswordField(false)
-      : setShowRepeatPasswordField(true);
+      ? setShowDisplayNameField(false)
+      : setShowDisplayNameField(true);
     if (value === "") return;
 
     // Password regex validation:
@@ -117,6 +133,16 @@ const SignUpPage: React.FC = () => {
       ? setIsPasswordValid(true)
       : setIsPasswordValid(false);
   };
+
+      // onIonInput provides an Event object, from which the value is used to set the state of the displayName field useState value
+      const handleDisplayNameInput = (ev: Event) => {
+        const value = (ev.target as HTMLInputElement).value;
+        setDisplayNameField(value);
+        // Resetting isDisplayNameValid state to undefined (initial state)
+        setIsDisplayNameValid(undefined);
+        // If the user hasn't entered anything, exit the function.
+        if (value === "") return;
+      };
 
   const Divider = ({ children }: any) => {
     return (
@@ -135,24 +161,47 @@ const SignUpPage: React.FC = () => {
   };
 
   
-  // Function to handle email and password sign-up
   const handleEmailPasswordSignUp = async () => {
-    // Set state for showing spinner/loading indicator
     setLoadingFor('signUp');
     try {
-      // ... any pre-signIn logic if needed
       // Try to sign up with the provided email and password
-      await createUserWithEmailAndPassword(auth, emailField, passwordField);
-      console.log("Successful signup noob")
-      // ... any post-signIn logic if needed
+      const userCredential = await createUserWithEmailAndPassword(auth, emailField, passwordField);
+      const user = userCredential.user;
+  
+      // Check if user is not null
+      if (user) {
+        // Add display name
+        await updateProfile(user, {
+          displayName: displayNameField
+        });
+        // Profile updated!
+        // ...
+      } else {
+        // Handle the case when there is no user (this should theoretically never happen here)
+        setToast({ isOpen: true, message: 'No user logged in', color: 'danger' });
+      }
     } catch (error) {
       // Handle error accordingly
       setToast({ isOpen: true, message: 'Error signing up with email and password, try again later', color: 'danger' });
     } finally {
       setLoadingFor('');
     }
-
   };
+
+    // Function to handle Google sign-in
+    const handleGoogleSignUp = async () => {
+      try {
+        // ... any pre-signIn logic if needed
+  
+        // Try to sign in with Google
+        await signInWithPopup(auth, new GoogleAuthProvider());
+  
+        // ... any post-signIn logic if needed
+      } catch (error) {
+        // Handle error accordingly
+        console.error("Error signing in with Google", error);
+      }
+    };
 
 
 
@@ -186,9 +235,9 @@ const SignUpPage: React.FC = () => {
       </div>
 
       <div style={{ padding: "8px 0" }}>
-        {/* The IonInput component to collect the email.
-            - `ion-valid` class is added if the email is valid.
-            - `ion-invalid` class is added if the email is invalid.
+        {/* The IonInput component to collect the password.
+            - `ion-valid` class is added if the password is valid.
+            - `ion-invalid` class is added if the password is invalid.
             - `ion-touched` class is added if the input has been touched/interacted with by the user. */}
         <IonInput
           className={`${isPasswordValid === true && "ion-valid"} ${
@@ -208,6 +257,30 @@ const SignUpPage: React.FC = () => {
         ></IonInput>
       </div>
 
+      {showDisplayNameField && (
+      <div style={{ padding: "8px 0" }}>
+        {/* The IonInput component to collect the email.
+            - `ion-valid` class is added if the email is valid.
+            - `ion-invalid` class is added if the email is invalid.
+            - `ion-touched` class is added if the input has been touched/interacted with by the user. */}
+        <IonInput
+          className={`${isDisplayNameValid === true && "ion-valid"} ${
+            isDisplayNameValid === false && "ion-invalid"
+          } ${isDisplayNameTouched && "ion-touched"}`}
+          fill="outline"
+          label="Name"
+          clearOnEdit={false}
+          labelPlacement="floating"
+          helperText=""
+          errorText="Invalid name"
+          // onIonInput provides an Event object,
+          onIonInput={handleDisplayNameInput}
+          onIonBlur={() => setIsDisplayNameTouched(true)}
+          placeholder=""
+        ></IonInput>
+      </div>
+      )}
+
       <div
         style={{
           textAlign: "center",
@@ -216,15 +289,6 @@ const SignUpPage: React.FC = () => {
         }}
         // className="ion-text-justify"
       >
-        {/* <Link to="/login">
-          <IonButton
-            fill="clear"
-            size="small"
-            style={{ textTransform: "none" }}
-          >
-            What the hell is coupon catch?
-          </IonButton>
-        </Link> */}
 
         <IonText className="ion-padding-top">
             <p>
@@ -244,28 +308,11 @@ const SignUpPage: React.FC = () => {
           </IonText>
 
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-        {/* <IonButton
-          disabled={isEmailValid !== true }
-          fill="clear"
-          size="small"
-          style={{
-            textTransform: "none",
-          }}
-          onClick={async () => {
-            
-          }}
-        >
-          Forgot password?
-        </IonButton> */}
       </div>
 
       <IonButton
-        style={{
-          height: "35px",
-          padding: "0",
-          textTransform: "none",
-        }}
+        className="signupBtn"
+        fill="outline"
         expand="block"
         // // Disable the button if either email or password is invalid
         // disabled={isEmailValid !== true || isPasswordValid !== true}
@@ -274,53 +321,58 @@ const SignUpPage: React.FC = () => {
 
       >
         <ButtonContent loadingFor={loadingFor} buttonName='signUp'>
-          Sign up
+        <IonText>
+          Sign up with email
+          </IonText>
         </ButtonContent>
       </IonButton>
 
       <Divider>OR</Divider>
 
-      <IonButton
-        fill="outline"
+      <div
         style={{
-          height: "35px",
-          borderRadius: "10px"
-        }}
-        className="signin-btn"
-        expand="block"
-
-        onClick={async () => {
-          try {
-          } catch (err: any) {}
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
 
-        <IonImg
-          src="btn_google_light_normal_ios.png"
-          style={{
-            padding: "0 24px 0 0",
-          }}
-          >
-        </IonImg>
-        <IonText>
-          <h6 style={{
-            margin: "10px auto",
-          }}>Sign up with Google</h6>
-        </IonText>
-      </IonButton>
-
       <IonButton
-        style={{
-          height: "35px",
-          padding: "8px 0",
-          textTransform: "none",
-        }}
-        expand="block"
-        onClick={switchToLogin}
-      >
-        Already have an account?
-      </IonButton>
+          className="googlesignupBtn"
+          expand="block"
+          fill="outline"
+          onClick={handleGoogleSignUp}
+          aria-label="Sign up with Google"
+        >
+        </IonButton>
 
+        <IonButton
+          style={{ padding: "8px 0 0 0" }}
+          onClick={toggleLogin}
+          className="loginBtn"
+          expand="block"
+        >
+          <IonText style={{ color: "white" }}>Already have an account?</IonText>
+        </IonButton>
+
+          {/* <IonRouterLink 
+          className=""
+          onClick={www.couponcatchapp.com/pricing#FAQ}
+        >
+          What's the catch?
+          </IonRouterLink> */}
+
+          <a 
+  href="https://www.couponcatchapp.com/pricing#FAQ"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="whatsthislink"
+>
+  What's the catch?
+</a>
+
+      </div>
       <IonToast
         isOpen={toast.isOpen}
         onDidDismiss={() => setToast({ ...toast, isOpen: false })}
@@ -329,64 +381,14 @@ const SignUpPage: React.FC = () => {
         color={toast.color}
       />
 
-      {/* Terms and Conditions modal with Download button*/}
-      <IonModal
-          ref={modal}
-          isOpen={showTermsModal}
-          onDidDismiss={() => setShowTermsModal(false)}
-          >
-          <IonHeader>
-            <IonToolbar>
-              <IonButtons slot="start">
-              <IonButton onClick={() => setShowTermsModal(false)}>
-                  Back
-                </IonButton>
-              </IonButtons>
-              <IonTitle>Terms and Conditions</IonTitle>
-              <IonButtons slot="end">
-                <IonButton download='/terms.pdf' strong={true} onClick={() => download()}>
-                  Download
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-            <IonItem>
-              <IonText>
-                <p>
-                  Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                  Omnis id illo aliquam quisquam nulla ducimus laborum fuga ipsa
-                  quos, nobis dignissimos necessitatibus blanditiis atque saepe?
-                  At rerum voluptates eaque qui harum magnam asperiores quia
-                  tempora, sunt, cumque saepe itaque mollitia, pariatur aliquam
-                  quasi tempore expedita. Harum illo fugiat similique expedita
-                  sunt amet est mollitia, necessitatibus quidem at corrupti.
-                  Adipisci placeat accusantium asperiores veniam obcaecati
-                  suscipit rerum! Vitae ad magnam adipisci rerum. Cupiditate
-                  autem maiores tempora labore eligendi quae fugit magni minus
-                  voluptatibus perferendis at quidem laborum dignissimos ullam
-                  dolorum quia commodi fugiat vel, maxime beatae? Quis quae eos
-                  exercitationem distinctio vero enim, perspiciatis est
-                  consequuntur aspernatur pariatur nobis voluptate esse unde
-                  itaque minima maiores adipisci autem nihil, explicabo
-                  repudiandae. Molestiae rerum accusantium similique voluptatum,
-                  doloribus, expedita assumenda quis est asperiores nam eveniet
-                  voluptates eaque, nihil deserunt tenetur corporis commodi
-                  recusandae reprehenderit laborum odit quam natus doloremque
-                  praesentium necessitatibus? Nobis recusandae illo voluptatibus
-                  laborum unde nostrum iure consequuntur distinctio deserunt,
-                  ducimus quas sed dolorum ex neque quae harum commodi quo
-                  facilis, explicabo velit? Nostrum eius tenetur inventore
-                  voluptate earum soluta voluptatem, necessitatibus illum,
-                  maxime mollitia labore totam ab repellat? Placeat voluptatum
-                  ducimus doloremque consequatur quaerat laborum minima totam
-                  beatae perspiciatis possimus quas quam et, minus blanditiis
-                  error dolorum sequi iste ratione, atque quos.
-                </p>
-              </IonText>
-            </IonItem>
-          </IonContent>
-        </IonModal>
+
+{/* Terms and Conditions modal with Download button*/}
+      <TermsModal
+        isOpen={showTermsModal}
+        onDidDismiss={() => setShowTermsModal(false)}
+      />
+
+
     </div>
 
   );

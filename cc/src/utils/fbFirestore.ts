@@ -1,0 +1,164 @@
+import { collection, setDoc, doc, getFirestore, onSnapshot, where, getDocs, updateDoc, getDoc } from "firebase/firestore"; 
+
+import { AuthStore, IUserInfoStore } from "./store";
+import { initializeApp } from "firebase/app";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyADNeSUyUp1ofLycqlpHRVUJ4u5PUAA1oM",
+  appId: "1:50437999849:web:68a5ea526c73645e32f478",
+  authDomain: "couponcatch-e211e.firebaseapp.com",
+  projectId: "couponcatch-e211e",
+  measurementId: "G-CH97T6GH6B",
+  storageBucket: "couponcatch-e211e.appspot.com",
+  messagingSenderId: "50437999849"
+};
+
+const app = initializeApp(firebaseConfig);
+
+
+const db = getFirestore();
+
+
+// Controllers
+// READS------------------------------------------------------------------------
+// SubData subscribes to data changes in a collection and calls the callback function
+export const subToCollection = (path: string, onDataUpdated: (data: any[]) => void) => {
+  console.log(`Fetching data from ${path}`);
+  const unsubscribe = onSnapshot(
+    collection(db, path),
+    (snapshot) => {
+      const data = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      onDataUpdated(data);
+    },
+    (error) => {
+      console.error(`Error fetching data from ${path}:`, error);
+    }
+  );
+  return unsubscribe;
+};
+
+// Subscribe to a single document
+export const subToDoc = (path: string, onDocUpdated: (docData: any) => void) => {
+  console.log(`Fetching document from ${path}`);
+  const docRef = doc(db, path);
+  const unsubscribe = onSnapshot(docRef, (docSnapshot) => {
+    if (docSnapshot.exists()) {
+      const docData = { id: docSnapshot.id, ...docSnapshot.data() };
+      onDocUpdated(docData);
+    } else {
+      console.error("No such document!");
+    }
+  }, 
+  (error) => {
+    console.error(`Error fetching document from ${path}:`, error);
+  });
+  return unsubscribe;
+};
+
+// Fetch collection data once
+export const fetchCollectionOnce = async (path: string) => {
+  console.log(`Fetching data from ${path}`);
+  const querySnapshot = await getDocs(collection(db, path));
+  console.log(`Data fetched from ${path}`);
+  return querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+};
+
+// Fetch document data once
+export const fetchDocOnce = async (path: string) => {
+  console.log(`Fetching document from ${path}`);
+  const docRef = doc(db, path);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    console.log(`Document fetched from ${path}`);
+    return docSnap.data();
+  } else {
+    // Handle the case where the document does not exist
+    console.log("No such document!");
+    return null;
+  }
+};
+
+// export const fetchReceiptsOnce = async (userId: string) => {
+//   console.log(`Fetching receipts for ${userId}`);
+//   const collectionPath = `users/${userId}/receipts`;
+//   const querySnapshot = await getDocs(collection(db, collectionPath));
+//   console.log(`Receipts fetched for ${userId}`);
+//   return querySnapshot.docs.map(doc => ({
+//     id: doc.id,
+//     ...doc.data(),
+//   }));
+// };
+
+// export const fetchUserDataOnce = async (userId: string) => {
+//   console.log(`Fetching user data ONCE for ${userId}`);
+//   const docRef = doc(db, `users/${userId}/info/settings`);
+//   const docSnap = await getDoc(docRef);
+
+//   if (docSnap.exists()) {
+//     console.log(`User data fetched ONCE for ${userId}`);
+//     return docSnap.data();
+//   } else {
+//     // Handle the case where the document does not exist
+//     console.log("No such document!");
+//     return null;
+//   }
+// };
+
+export const fetchUserData = (userId: string, onUserDataUpdated: (userData: any) => void) => {
+  console.log(`Fetching user data for ${userId}`);
+  const docRef = doc(db, `users/${userId}/info/settings`);
+  const unsubscribe = onSnapshot(docRef, (doc) => {
+    if (doc.exists()) {
+      onUserDataUpdated(doc.data());
+    } else {
+      // Handle the case where the document does not exist
+      console.log("No such document!");
+    }
+  });
+  console.log(`User data fetched for ${userId}`);
+  return unsubscribe;
+};
+
+
+
+
+// WRITES-----------------------------------------------------------------------
+export const markReceiptUnlocked = async (userId: string, receiptId: string, totalCouponAmount: number) => {
+  try {
+    const receiptPath = `users/${userId}/receipts/${receiptId}`;
+    const receiptRef = doc(db, receiptPath);
+
+    await updateDoc(receiptRef, {
+      isUnlocked: true,
+      totalCouponAmountUnlocked: totalCouponAmount
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error unlocking receipt: ", error);
+    return { success: false, error: error };
+  }
+};
+
+export const mergeUserSettingsInFirestore = async (userInfo: Partial<IUserInfoStore>, userId: string) => {
+  const userSettingsDocRef = doc(db, `users/${userId}/info/settings`);
+
+  try {
+      await setDoc(userSettingsDocRef, userInfo, { merge: true });
+      console.log(`User settings successfully updated for user ${userId}`);
+  } catch (error) {
+      console.error(`Failed to update user settings for user ${userId}:`, error);
+  }
+};
+
+
+
+export {collection, db};

@@ -6,29 +6,35 @@
 // - exact: A boolean representing whether the path should be exactly matched.
 
 import { Redirect, Route } from 'react-router-dom';
-import { UserStore } from "../utils/store";
+import { AuthStore } from "../utils/store";
 import { IonLoading } from '@ionic/react';
 
 const ProtectedRoute: React.FC<{
-  component: React.ElementType; // React.ElementType represents a component (either class or functional) that can be rendered.
+  component: React.ElementType;
   path: string;
   exact: boolean;
 }> = ({ component: Component, ...rest }) => {
-  // Use the useState method of pullstate to get the isAuthed value from UserStore
-  const isAuthed = UserStore.useState(s => s.isAuthed);
-  const authChecked = UserStore.useState(s => s.authChecked);
-  
-  return (
-<Route
-      {...rest}
-      render={(props) => {
-        if (!authChecked) {
-          return <IonLoading />;
-        }
-        return isAuthed ? <Component {...props} /> : <Redirect to="/auth" />;
-      }}
-    />
-  );
+  const isAuthed = AuthStore.useState(s => s.isAuthed);
+  const authChecked = AuthStore.useState(s => s.authChecked);
+
+    // Early return for loading state
+  if (!authChecked) {
+      return <IonLoading isOpen={true} message={"Loading..."} />;
+    }
+//   return (
+//     <Route
+//       {...rest}
+//       render={(props) => isAuthed ? <Component {...props} /> : <Redirect to="/auth" />}
+//     />
+//   );
+// };
+  // Early return for the authenticated route
+  if (isAuthed) {
+    return <Route {...rest} render={(props) => <Component {...props} />} />;
+  }
+
+  // Redirect if not authenticated
+  return <Redirect to="/auth" />;
 };
 
 export default ProtectedRoute;

@@ -11,10 +11,21 @@ import 'swiper/css';
 import 'swiper/swiper-bundle.css';
 import '@ionic/react/css/ionic-swiper.css';
 import { useRef } from 'react';
+import { AuthStore } from '../utils/store';
+import DemoUINotice from '../components/DemoUINotice';
+import { IAuthStore } from '../utils/store';
+import { useStoreState } from 'pullstate';
+
 
 const SaleDetailPage: React.FC = () => {
-  const { month } = useParams<{ month: string }>();
+  const selectUid = (state: IAuthStore) => state.uid;
+const uid = useStoreState(AuthStore, selectUid);
 
+
+  const { month } = useParams<{ month: string }>();
+  const user = AuthStore.useState((s) => s.user);
+  // make the first letter of the month uppercase
+  const formattedMonth = month.charAt(0).toUpperCase() + month.slice(1);
   // Retrieve ad data based on the month or do anything with the month parameter.
   
   // Example images array, replace with your actual data
@@ -40,7 +51,7 @@ const SaleDetailPage: React.FC = () => {
     <IonButtons slot="start">
       <IonBackButton defaultHref="/dashboard/sale"></IonBackButton>
     </IonButtons>
-    <IonTitle>{month}</IonTitle>
+    <IonTitle>{formattedMonth}</IonTitle>
   </IonToolbar>
   
       <IonContent>
@@ -56,6 +67,8 @@ const SaleDetailPage: React.FC = () => {
           ))}
         </swiper-container>
 
+        {/* Include the DemoAccountNotice component */}
+        <DemoUINotice uid={uid} />
 
       </IonContent>
     </IonPage>
