@@ -150,26 +150,34 @@ export function extractStoreTrmTrnOp(text: string, regexPattern: RegExp): StoreT
  * @param text The text to extract data from.
  * @returns The number of items sold.
  */
-export function extractItemsSold(text: string): number {
+export function extractItemsSold(text: string) {
+    let numberOfItems = 0;
     const itemsSoldRegex = /Items Sold:\s*(\d+)/i;
     const itemsSoldRegexTwo = /NUMBER OF ITEMS SOLD\s*[=-]?\s*\n\s*(\d+)/;
 
     // Extract number of items sold from the first pattern
     const itemsSoldMatch = text.match(itemsSoldRegex);
     if (itemsSoldMatch) {
-        text = text.replace(itemsSoldRegex, "");
-        return parseInt(itemsSoldMatch[1], 10);
+        numberOfItems = parseInt(itemsSoldMatch[1], 10);
     }
 
-    // Extract number of items sold from the second pattern
-    const itemsSoldMatchTwo = text.match(itemsSoldRegexTwo);
-    if (itemsSoldMatchTwo && itemsSoldMatchTwo[1] == "0") {
-        text = text.replace(itemsSoldRegexTwo, "");
-        return parseInt(itemsSoldMatchTwo[1], 10);
+    // Always remove the first pattern, regardless of finding a match
+    text = text.replace(itemsSoldRegex, "");
+
+    // If no match was found or number of items was 0, attempt the second pattern
+    if (numberOfItems === 0) {
+        const itemsSoldMatchTwo = text.match(itemsSoldRegexTwo);
+        if (itemsSoldMatchTwo) {
+            numberOfItems = parseInt(itemsSoldMatchTwo[1], 10);
+        }
     }
 
-    // Return 0 if no match is found
-    return 0;
+    // Always remove the second pattern, regardless of finding a match
+    // This line should come after potentially using the second regex to extract the number of items
+    text = text.replace(itemsSoldRegexTwo, "");
+
+    // Return the number of items sold (or 0 if not found)
+    return numberOfItems;
 }
 
 export function extractTotalAmount(text: string, regexPattern: RegExp): number {

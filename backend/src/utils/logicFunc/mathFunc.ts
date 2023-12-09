@@ -7,76 +7,100 @@ export function findTaxAndRebateAmounts(
     includeExecRebate: boolean
   ): { taxAmount: number; execRebateAmount: number; subtotal: number } {
     const epsilon = 0.01;
-    const sortedDollarAmounts = [...new Set(dollarAmounts)].sort(
-      (a, b) => a - b
-    );
+    let amountsMap = new Map();
     let potentialTaxAmounts: number[] = [];
-  
-    for (const amount of sortedDollarAmounts) {
-      const potentialSubtotal = totalAmount - amount;
-      if (
-        sortedDollarAmounts.some(
-          (a) => Math.abs(a - potentialSubtotal) < epsilon
-        )
-      ) {
-        potentialTaxAmounts.push(amount);
-      }
+
+    // let's use a hashmap, because we're not cavemen
+    dollarAmounts.forEach(amount => {
+      let potentialSubtotal = totalAmount - amount;
+      // do your logic here in a single pass, champ
+  });
+
+    // iterate over unique dollar amounts
+    amountsMap.forEach((_, amount) => {
+        let potentialSubtotal = totalAmount - amount;
+        // check in the map instead of array, saves us from an existential crisis
+        if (amountsMap.has(potentialSubtotal) && Math.abs(amount - potentialSubtotal) >= epsilon) {
+            potentialTaxAmounts.push(amount);
+        }
+    });
+
+    // let's find the smallest tax amount, if any
+    let taxAmount = 0, execRebateAmount = 0, subtotal = totalAmount;
+    if (potentialTaxAmounts.length > 0) {
+        taxAmount = Math.min(...potentialTaxAmounts);
+        subtotal -= taxAmount;
+
+        // oh, you want an exec rebate? let's find the next smallest
+        if (includeExecRebate) {
+            potentialTaxAmounts = potentialTaxAmounts.filter(amount => amount !== taxAmount);
+            if (potentialTaxAmounts.length > 0) {
+                execRebateAmount = Math.min(...potentialTaxAmounts);
+            }
+        }
     }
-  
-    let taxAmount = 0;
-    let execRebateAmount = 0;
-    let subtotal = totalAmount;
-  
-    const nonZeroTaxAmounts = potentialTaxAmounts.filter(
-      (amount) => amount > 0
-    );
-    if (nonZeroTaxAmounts.length > 0) {
-      taxAmount = Math.min(...nonZeroTaxAmounts);
-      const filteredTaxAmounts = nonZeroTaxAmounts.filter(
-        (amount) => amount !== taxAmount
-      );
-      if (includeExecRebate && filteredTaxAmounts.length > 0) {
-        execRebateAmount = Math.min(...filteredTaxAmounts);
-      }
-      subtotal = totalAmount - taxAmount;
-      subtotal = parseFloat(subtotal.toFixed(2));
-    }
-  
+
+    // rounding because we're dealing with money, not monopoly money
+    subtotal = parseFloat(subtotal.toFixed(2));
+
     return { taxAmount, execRebateAmount, subtotal };
-  }
+}
   
 
     // add in multiplier lines to receipts items lines
   export function processMultiplierLines(multiplierLines: IMultiplierLine[], itemLines: any[]) {
-    // create a map for faster lookup
-    const itemMap = new Map(itemLines.map(item => [item.itemNumber, item]));
-
-    multiplierLines.forEach(multiplierLine => {
-        const item = itemMap.get(parseInt(multiplierLine.itemNumber, 10));
-        if (item) {
-            const product = multiplierLine.multiple * multiplierLine.amount;
-            // let's not divide by zero, shall we?
-            if (product !== 0 && item.itemPrice % product === 0) {
-                item.itemPrice = multiplierLine.amount;
-                item.quantity = multiplierLine.multiple;
-            }
-        }
-    });
-
-    // update numberOfItemsOnReceipt only if it's not already set
-    return itemLines.reduce((acc, item) => acc + item.quantity, 0);
-}
+      // Create a map for faster lookup
+      const itemMap = new Map(itemLines.map(item => [item.itemNumber, item]));
+  
+      // Parse the multiplier item numbers once, outside the loop
+      const parsedMultiplierLines = multiplierLines.map(multiplierLine => ({
+          ...multiplierLine,
+          itemNumber: parseInt(multiplierLine.itemNumber, 10)
+      }));
+  
+      parsedMultiplierLines.forEach(multiplierLine => {
+          const item = itemMap.get(multiplierLine.itemNumber);
+          if (item) {
+              // Directly apply the multiplier line values to the item
+              item.itemPrice = multiplierLine.amount;
+              item.quantity = multiplierLine.multiple;
+          }
+      });
+  }
 
 export function assignCouponsToItems(itemLines: ILineItem[], couponAmounts: number[]) {
-  const couponIterator = couponAmounts[Symbol.iterator]();
+  let couponIndex = 0; // because we're not savages
 
   return itemLines.map(itemLine => {
       if (itemLine.couponNum !== "") {
-          const couponAmount = couponIterator.next().value;
+          const couponAmount = couponAmounts[couponIndex++];
           itemLine.origPurchasedCouponAmt = couponAmount ? couponAmount.toString() : "";
       } else {
           itemLine.origPurchasedCouponAmt = "";
       }
       return itemLine;
   });
+}
+
+export function processDollarAmounts(dollarAmounts: number[], itemLines: ILineItem[]) {
+  // Find the first zero, use entire array if no zero found
+  const endIndex = dollarAmounts.indexOf(0);
+  const dollarAmountsToUse = endIndex !== -1 ? dollarAmounts.slice(0, endIndex) : dollarAmounts;
+  const lengthDifference = dollarAmountsToUse.length - itemLines.length;
+
+  // Update itemPrices only if lengthDifference is within the range
+  if (lengthDifference <= 3) {
+      for (let i = 0; i < itemLines.length; i++) {
+          if (i < dollarAmountsToUse.length) {
+              itemLines[i].itemPrice = dollarAmountsToUse[i];
+          }
+      }
+  }
+
+  // Adjust itemLines array length to match dollarAmountsToUse
+  if (lengthDifference < 0) {
+      itemLines.length = dollarAmountsToUse.length;
+  }
+
+  return { itemLines };
 }

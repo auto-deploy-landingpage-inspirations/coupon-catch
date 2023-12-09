@@ -1,5 +1,5 @@
 import { cleanDataWithRegex, cleanNoncaptureLines } from "./dataCleaning";
-import { assignCouponsToItems, findTaxAndRebateAmounts, processMultiplierLines } from "./logicFunc/mathFunc";
+import { assignCouponsToItems, findTaxAndRebateAmounts, processDollarAmounts, processMultiplierLines } from "./logicFunc/mathFunc";
 import { IMultiplierLine } from "../models/IMultiplierLine";
 import { IReceipt } from "../models/IReceipt";
 import { ILineItem } from "../models/ILineItem";
@@ -63,9 +63,6 @@ function processReceiptText(text: string): {
     totalCouponAmount: 0,
   };
   
-
-  console.log("This is the text BEFORE noncapture runs\n", updatedText);
-
   // remove non-capture lines
   updatedText = cleanNoncaptureLines(updatedText);
 
@@ -89,6 +86,8 @@ function processReceiptText(text: string): {
     updatedText,
     /(?:#\d{1,4}\s+)([\d\w\s.]+,\s+[A-Z]{2}\s+\d{5})/
   );
+  updatedText = updatedText.replace(/(?<=#\d{1,4}\s+)([\d\w\s.]+,\s+[A-Z]{2}\s+\d{5})/, "");
+  
   if (receipt.storeAddress == "") {
     receipt.storeAddress = extractStoreAddressTwo(
       updatedText,
@@ -100,14 +99,11 @@ function processReceiptText(text: string): {
     /(\d{1,}) [a-zA-Z0-9\s]+(?:Avenue|Lane|Road|Boulevard|Drive|Street|Suite|Ave|Dr|Rd|Blvd|Ln|St|Ste)?,?\s+[a-zA-Z]+,?\s+[A-Z]{2} [0-9]{5,6}/,
     ""
   );
- console.log("This is the text AFTER store address runs\n", updatedText);
 
   // Extract store name
   receipt.storeName = extractStoreName(updatedText, /([a-zA-Z ]+)(?=\s#\d+)/);
   updatedText = updatedText.replace(/([a-zA-Z ]+)(?=\s#\d+)/, "");
   
-  console.log("This is the text AFTER store name runs\n", updatedText);
-
   // Extract store number
   receipt.storeNumber = extractStoreNumber(updatedText, /#\s*(\d+)/);
   updatedText = updatedText.replace(/#\s*(\d+)/, "");
@@ -160,8 +156,16 @@ function processReceiptText(text: string): {
   updatedText = updatedText.replace(/(\d{2}:\d{2})/g, "");
 
 
+
+
+
   // Extract number of items
   receipt.numberOfItems = extractItemsSold(updatedText);
+// 
+
+
+
+
 
   // Extract total amount of purchase
   const totalAmountRegex = /AMOUNT: *\$(\d+\.\d{2})/;
@@ -216,9 +220,8 @@ function processReceiptText(text: string): {
   // remove all occurences of * characters
   updatedText = updatedText.replace(/\*/g, "");
   // remove all lines that start with BOB.*|Bottom.*|Count.*
-  const removeBobRegex = /^(BOB.*|Bottom.*|Count.*)$/gm;
+  const removeBobRegex = /^(BOB.*|Bottom.*|Count.*|SELF-.*|ADJ.*)$/gm;
   updatedText = updatedText.replace(removeBobRegex, "");
-  // console.log("This is text left before line items are ran", updatedText);
   // Remove any empty spaces at the beginning of a line
   updatedText = updatedText.replace(/^\s+/gm, "");
     // Remove any emtpty lines
@@ -275,14 +278,6 @@ function processReceiptItemLines(
   dollarAmounts: number[],
   numberOfItemsOnReceipt: number,
 ): { updatedItemLines: any[] } {
-
-console.log("Here are the values passed to processReceiptItemLines when it starts:\n", 
-"UpdatedText:\n", updatedText, 
-"\nReceiptId\n", receiptId, 
-"\nmultiLines\n", ...multiplierLines, 
-"\ncouponsAmounts\n", ...couponAmounts, 
-"\ndollarAmounts\n", ...dollarAmounts, 
-"\nNum of items\n", numberOfItemsOnReceipt);
 
 let itemLines: ILineItem[] = [];
 let remainingText = updatedText;
@@ -394,31 +389,9 @@ numberOfItemsOnReceipt = processMultiplierLines(multiplierLines, itemLines);
   itemLines = assignCouponsToItems(itemLines, couponAmounts);
 
 
-  // iterate through dollarAmounts array adding each item to the new array "dollarAmountsToZero" until the value 0 is reached, at which point, do not add 0 to the array.
-  let dollarAmountsToZero: number[] = [];
+  const result = processDollarAmounts(dollarAmounts, itemLines);
+  itemLines = result.itemLines;
 
-  for (let amount of dollarAmounts) {
-    if (amount === 0) {
-      break; // Stop the loop when a 0 is encountered
-    }
-    dollarAmountsToZero.push(amount); // Add amount to the new array
-  }
-  // Set dollarAmounts to the new dollarAmountsToZero array
-  dollarAmounts = dollarAmountsToZero;
-
-  if (dollarAmountsToZero.length - itemLines.length <= 3) {
-    // Iterate through the itemLines array, adding the dollarAmountsToZero values to the itemLines.itemPrice
-    itemLines.forEach((itemLine, index) => {
-      itemLine.itemPrice = dollarAmountsToZero[index];
-    });
-  }
-  console.log("dollar amounts to zero length", dollarAmountsToZero.length);
-  console.log("item lines length", itemLines.length);
-
-  if (dollarAmountsToZero.length < itemLines.length) {
-    // remove the last item off the end of the itemLines array
-    itemLines.pop();
-  }
 
   return { updatedItemLines: itemLines };
 }
