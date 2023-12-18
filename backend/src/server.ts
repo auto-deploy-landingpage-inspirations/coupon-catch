@@ -20,11 +20,13 @@ import createCheckoutSessionRoutes from "./routes/createCheckoutSessionRoutes";
 // Initialize Firebase Admin SDK
 const serviceAccount = JSON.parse(
   fs.readFileSync("couponcatch-e211e-firebase-admin.json", "utf8")
-);
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+  );
+  
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+  
+  export const db = admin.firestore();
 
 const projectId = process.env.PROJECT_ID;
 
