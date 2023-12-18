@@ -1,22 +1,16 @@
 import {
   IonApp,
-  IonIcon,
-  IonLabel,
   IonRouterOutlet,
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
-  IonRoute,
   setupIonicReact,
   IonLoading,
   IonSpinner,
-  IonPage,
   IonHeader,
   IonToolbar,
   IonButtons,
   IonBackButton,
   IonTitle,
   IonContent,
+  IonPage,
 } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import { IonReactRouter } from "@ionic/react-router";
@@ -48,17 +42,26 @@ import {
   subToDoc,
   fetchCollectionOnce,
   fetchDocOnce,
+  fetchReceiptsOnce,
+  fetchItemLinesOnce,
+  subToReceipts,
+  subToItemLines,
 } from "./utils/fbFirestore";
 import { onAuthStateChanged } from "./utils/fbAuth"
 import { User as FirebaseUser } from "firebase/auth";
-import { ICouponItem } from "./utils/types";
+import { ICouponItem, IReceiptItem } from "./utils/types";
 import { AuthStore, UserInfoStore } from "./utils/store";
 import { ReceiptStore } from "./utils/store";
 import { CouponStore } from "./utils/store";
-import { IUserInfoStore } from "./utils/store";
 import { updateUserSettings } from "./utils/miscUtils";
-import { list } from "firebase/storage";
 import { auth } from "./utils/fbAuth";
+import { db } from "./utils/fbFirestore";
+import { collection, query, where, getDocs, doc } from "firebase/firestore"; 
+import { listeners } from "process";
+import { differenceInDays, addDays, parse } from 'date-fns';
+
+
+
 setupIonicReact({
   mode: "ios", // 'md' for Material Design, 'ios' for iOS design
 });
@@ -66,9 +69,6 @@ setupIonicReact({
 
 // Entry point for the app
 const App: React.FC = () => {
-
-  // const history = useHistory();
-  //Use pullstate states
   const isAuthed = AuthStore.useState((s) => s.isAuthed);
   const [isLoading, setIsLoading] = useState(true); // Introduce a loading state
   // Local state that tracks whether the auth state has been checked for purpose of displaying loading screen before auth state is checked
@@ -76,9 +76,10 @@ const App: React.FC = () => {
   const couponList = CouponStore.useState((s) => s.couponList);
   const isDemoUser = AuthStore.useState((s) => s.isDemoUser);
   const uid = AuthStore.useState((s) => s.uid);
-const receiptsUpdated = AuthStore.useState((s) => s.receiptsUpdated);
+const receiptList = ReceiptStore.useState((s) => s.receiptList);
+const [isCouponListLoading, setIsCouponListLoading] = useState(true);
 
-  // useEffect for handling auth of user or demo user, receipts and user data fetching come later (above)
+  // useEffect for handling Auth via Firebase live listener
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(
       auth,
@@ -138,6 +139,7 @@ const receiptsUpdated = AuthStore.useState((s) => s.receiptsUpdated);
         CouponStore.update((s) => {
           s.couponList = couponListData;
         });
+        setIsCouponListLoading(false); // Set loading state to false after fetching data
         console.log("Coupon list updated to store");
       });
 
@@ -146,40 +148,100 @@ const receiptsUpdated = AuthStore.useState((s) => s.receiptsUpdated);
       };
     }, [isAuthed]);
 
+    // hmm. yeah lets move logic to the backend. i dont need to get the whole damn firestore document or collection on initital load of the front end and make the front end do the logic, the backend should do the logic and send it to the front end. i can also make my firestore queires very fine tuned so im not sending the whole shabang of data over. in terms of determining my needs, i guess i need to think about what i want to show on the ui so i know how to shape the response of the server?
 
-    // useEffect for Receipts Data Fetching. This is done after isAuthed is true, and done differently for demo users and regular users
-    useEffect(() => {
-      // Only proceed if user is authenticated
-      if (!isAuthed) return;
-    
-      let unsubscribeReceipts: (() => void) | undefined;
-    
-      if (isDemoUser) {
-        // Fetch receipts for demo users
-        subToCollection(`users/${uid}/receipts`, (receiptsData) => {
-          ReceiptStore.update((s) => {
-            s.receiptList = receiptsData;
-          });
-        });
+    // And when should I do the math on if the user has coupons avail or not? when the initial call for data (after user logs in) comes in? is there a way to do it before so its ready?
+
+    // soooooooooo actually just do queries with 'where' 'in' an the like in firestore
+
+
+
+
+// Define the function to perform calculations
+const calculateReceiptFields = (receipts: IReceiptItem[]) => {
+  const currentDate = new Date();
+  const couponEndDate = parse(couponList[0].couponEndDate, 'MM/dd/yyyy', currentDate);
+  let daysToCouponEnd = differenceInDays(couponEndDate, currentDate);
+
+  receipts.forEach(receipt => {
+    const dateOfPurchase = parse(receipt.dateOfPurchase, 'MM/dd/yyyy', currentDate);
+    const date30DaysFromPurchase = addDays(dateOfPurchase, 30);
+    let daysFromDoP = differenceInDays(date30DaysFromPurchase, currentDate);
+
+    receipt.unlockCouponTotal = receipt.itemLines.reduce((total, itemLine) => {
+      const coupon = couponList.find(coupon => coupon.itemNumber === itemLine.itemNumber);
+      if (coupon) {
+        if (typeof coupon.discount === 'number') {
+          return total + coupon.discount;
+        } else {
+          console.error(`Invalid discount for itemNumber ${itemLine.itemNumber}: ${coupon.discount}`);
+        }
       } else {
-        // Subscribe to receipts for regular users
-        unsubscribeReceipts = subToCollection(`users/${uid}/receipts`, (receiptsData) => {
-          ReceiptStore.update((s) => {
-            s.receiptList = receiptsData;
-          });
-        });
+        // console.warn(`No coupon found for itemNumber ${itemLine.itemNumber}`);
       }
-      AuthStore.update((s) => {
-        s.receiptsUpdated = true;
-      });
-    
-      // Return a cleanup function
+      return total;
+    }, 0);
+
+    receipt.daysLeft = Math.max(0, Math.min(daysFromDoP, daysToCouponEnd));
+  });
+};
+
+
+
+// original
+    // useEffect for Receipts Fetching. This is done after isAuthed is true, and done differently for demo users and regular users
+    useEffect(() => {
+      if (!isAuthed || isCouponListLoading) return;
+
+      let unsubscribeReceipts: (() => void) | undefined;
+      let unsubscribeItemLines: (() => void) | undefined;
+
+      const updateReceipts = async () => {
+        let receipts: IReceiptItem[] | undefined;
+        if (isDemoUser) {
+          receipts = await fetchReceiptsOnce(uid);
+          for (let receipt of receipts) {
+            const itemLines = await fetchItemLinesOnce(uid, [receipt.id]);
+            receipt.itemLines = itemLines;
+          }
+        } else {
+          // user is not demo user
+          unsubscribeReceipts = subToReceipts(uid, (data) => {
+            receipts = data;
+            const receiptIds = receipts.map(receipt => receipt.id);
+            unsubscribeItemLines = subToItemLines(uid, receiptIds, (itemLines) => {
+              if (!receipts) return;
+              for (let receipt of receipts) {
+                receipt.itemLines = itemLines.filter(itemLine => itemLine.receiptId === receipt.id);
+              }
+            });
+          });
+        }
+
+        if(receipts == undefined) return;
+
+        calculateReceiptFields(receipts);
+ 
+
+        ReceiptStore.update((s) => {
+          if (receipts) {
+            s.receiptList = receipts;
+          }
+        });
+      };
+
+      updateReceipts();
+
+
       return () => {
         if (unsubscribeReceipts) {
           unsubscribeReceipts();
         }
+        if (unsubscribeItemLines) {
+          unsubscribeItemLines();
+        }
       };
-    }, [isAuthed, isDemoUser, uid]);
+    }, [isAuthed, isDemoUser, uid, isCouponListLoading]); // Add isCouponListLoading to the dependency array
 
 
     // useEffect for User Data Fetching. This is done after isAuthed is true, and done differently for demo users and regular users
@@ -191,7 +253,7 @@ const receiptsUpdated = AuthStore.useState((s) => s.receiptsUpdated);
     
       if (isDemoUser) {
         // Fetch user data for demo users
-        fetchDocOnce(`users/${uid}/info/settings`).then(userData => {
+        fetchDocOnce(`users/${uid}`).then(userData => {
           updateUserSettings(userData, uid);
         });
          
@@ -212,72 +274,81 @@ const receiptsUpdated = AuthStore.useState((s) => s.receiptsUpdated);
     
 
   // useEffect for Applying Coupons to demo user account
-  useEffect(() => {
-    if (isDemoUser && receiptsUpdated) {
-      updateReceipt(0, 24, 5, couponList);
-      updateReceipt(1, 10, 2, couponList);
-      updateReceipt(2, 24, 0, couponList);
-      updateReceipt(3, 37, 0, couponList);
+  // useEffect(() => {
+  //   if (isDemoUser && receiptsUpdated) {
+  //     updateReceipt(0, 24, 5, couponList);
+  //     updateReceipt(1, 10, 2, couponList);
+  //     updateReceipt(2, 24, 0, couponList);
+  //     updateReceipt(3, 37, 0, couponList);
 
-      UserInfoStore.update((s) => {
-        s.isDemoCouponApplied = true;
-      });
-    }
-  }, [couponList, isDemoUser, receiptsUpdated]);
+  //     UserInfoStore.update((s) => {
+  //       s.isDemoCouponApplied = true;
+  //     });
+  //   }
+  // }, [couponList, isDemoUser, receiptsUpdated]);
 
-  const updateReceipt = (
-    receiptIndex: any,
-    daysAgo: number,
-    numberOfCoupons: number = 0,
-    couponList: any[]
-  ) => {
-    // Update the date of purchase
-    const receiptDate = new Date();
-    receiptDate.setDate(receiptDate.getDate() - daysAgo);
-    const receiptDateString = `${
-      receiptDate.getMonth() + 1
-    }/${receiptDate.getDate()}/${receiptDate.getFullYear()}`;
+  // const updateReceipt = (
+  //   receiptIndex: any,
+  //   daysLeft: number,
+  //   numberOfCoupons: number = 0,
+  //   couponList: any[]
+  // ) => {
 
-    ReceiptStore.update((s) => {
-      if (receiptIndex >= 0 && receiptIndex < s.receiptList.length) {
-        s.receiptList[receiptIndex].dateOfPurchase = receiptDateString;
-      }
-    });
 
-    // Update the receipt's item lines with selected coupons if there are any
-    if (numberOfCoupons > 0) {
-      // Filter coupons with discount less than $10 and randomly pick 'numberOfCoupons' items
-      const eligibleCoupons = couponList.filter(
-        (coupon) => coupon.discount < 10
-      );
 
-      const selectedCoupons: ICouponItem[] = [];
-      while (
-        selectedCoupons.length < numberOfCoupons &&
-        eligibleCoupons.length > 0
-      ) {
-        const randomIndex = Math.floor(Math.random() * eligibleCoupons.length);
-        selectedCoupons.push(...eligibleCoupons.splice(randomIndex, 1));
-      }
 
-      //     // Update the receipt's item lines with selected coupons
-      ReceiptStore.update((s) => {
-        if (receiptIndex >= 0 && receiptIndex < s.receiptList.length) {
-          const receipt = s.receiptList[receiptIndex];
 
-          selectedCoupons.forEach((coupon, index: number) => {
-            if (receipt.itemLines && receipt.itemLines.length > index) {
-              const itemLine = receipt.itemLines[index];
 
-              // Update item number and coupon amount
-              itemLine.itemNumber = String(coupon.itemNumber);
-              itemLine.couponAmt = String(coupon.discount);
-            }
-          });
-        }
-      });
-    }
-  };
+
+
+  
+  //   // Update the date of purchase
+  //   const receiptDate = new Date();
+  //   receiptDate.setDate(receiptDate.getDate() - daysAgo);
+  //   const receiptDateString = `${
+  //     receiptDate.getMonth() + 1
+  //   }/${receiptDate.getDate()}/${receiptDate.getFullYear()}`;
+
+  //   ReceiptStore.update((s) => {
+  //     if (receiptIndex >= 0 && receiptIndex < s.receiptList.length) {
+  //       s.receiptList[receiptIndex].dateOfPurchase = receiptDateString;
+  //     }
+  //   });
+
+  //   // Update the receipt's item lines with selected coupons if there are any
+  //   if (numberOfCoupons > 0) {
+  //     // Filter coupons with discount less than $10 and randomly pick 'numberOfCoupons' items
+  //     const eligibleCoupons = couponList.filter(
+  //       (coupon) => coupon.discount < 10
+  //     );
+
+  //     const selectedCoupons: ICouponItem[] = [];
+  //     while (
+  //       selectedCoupons.length < numberOfCoupons &&
+  //       eligibleCoupons.length > 0
+  //     ) {
+  //       const randomIndex = Math.floor(Math.random() * eligibleCoupons.length);
+  //       selectedCoupons.push(...eligibleCoupons.splice(randomIndex, 1));
+  //     }
+
+  //     // Update the receipt's item lines with selected coupons
+  //     ReceiptStore.update((s) => {
+  //       if (receiptIndex >= 0 && receiptIndex < s.receiptList.length) {
+  //         const receipt = s.receiptList[receiptIndex];
+
+  //         selectedCoupons.forEach((coupon, index: number) => {
+  //           if (receipt.itemLines && receipt.itemLines.length > index) {
+  //             const itemLine = receipt.itemLines[index];
+
+  //             // Update item number and coupon amount
+  //             itemLine.itemNumber = String(coupon.itemNumber);
+  //             itemLine.couponAmt = String(coupon.discount);
+  //           }
+  //         });
+  //       }
+  //     });
+  //   }
+  // };
 
   // Return early if auth state has not been checked
   if (!authChecked) {
@@ -298,6 +369,7 @@ const receiptsUpdated = AuthStore.useState((s) => s.receiptsUpdated);
 );
   }
 
+console.log("here is receipts list", receiptList);
   console.log("App is rendering. User isAuthed:", isAuthed);
   return (
     <IonApp>

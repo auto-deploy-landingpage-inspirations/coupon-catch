@@ -1,7 +1,7 @@
 import { Store } from "pullstate";
+import { IReceiptItem } from "../utils/types";
 
 export interface IAuthStore {
-  receiptsUpdated: boolean,
   couponsChecked: boolean,
   isAuthed: boolean;
   authChecked: boolean;
@@ -12,7 +12,6 @@ export interface IAuthStore {
 }
 
 export const AuthStore = new Store<IAuthStore>({
-    receiptsUpdated: false,
     couponsChecked: false,
     isAuthed: false,
     authChecked: false,
@@ -23,7 +22,7 @@ export const AuthStore = new Store<IAuthStore>({
 });
 
 interface IReceiptStore {
-  receiptList: any[];
+  receiptList: IReceiptItem[];
 }
 
 export const ReceiptStore = new Store<IReceiptStore>({

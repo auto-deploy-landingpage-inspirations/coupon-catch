@@ -32,3 +32,5 @@ yarn-error.log*
 /adtodb/package-lock.json
 /backend/node_modules
 /cc/node_modules
+
+backend/uploads

@@ -1,7 +1,8 @@
-import { collection, setDoc, doc, getFirestore, onSnapshot, where, getDocs, updateDoc, getDoc } from "firebase/firestore"; 
+import { collection, setDoc, doc, getFirestore, onSnapshot, where, getDocs, updateDoc, getDoc, query } from "firebase/firestore"; 
 
 import { AuthStore, IUserInfoStore } from "./store";
 import { initializeApp } from "firebase/app";
+import { ILineItem, IReceiptItem } from "./types";
 
 
 const firebaseConfig = {
@@ -41,6 +42,59 @@ export const subToCollection = (path: string, onDataUpdated: (data: any[]) => vo
   return unsubscribe;
 };
 
+
+export const subToReceipts = (userId: string, onReceiptsUpdated: (receipts: IReceiptItem[]) => void) => {
+  const receiptsRef = collection(db, 'receipts');
+  const q = query(receiptsRef, where('userId', '==', userId), where('isDeleted', '==', false));
+
+  const unsubscribe = onSnapshot(q, (snapshot) => {
+    const receipts = snapshot.docs.map(doc => ({
+      id: doc.id,
+      terminalNumber: doc.data().terminalNumber,
+      transactionNumber: doc.data().transactionNumber,
+      operatorNumber: doc.data().operatorNumber,
+      dateOfPurchase: doc.data().dateOfPurchase,
+      createdAt: doc.data().createdAt,
+      daysLeft: doc.data().daysLeft,
+      isUnlocked: doc.data().isUnlocked,
+      isRedeemed: doc.data().isRedeemed,
+      isDeleted: doc.data().isDeleted,
+      itemLines: doc.data().itemLines,
+      unlockCouponTotal: doc.data().unlockCouponTotal,
+    }));
+    onReceiptsUpdated(receipts);
+  });
+
+  // Return the unsubscribe function to allow caller to stop listening
+  return unsubscribe;
+};
+
+export const subToItemLines = (userId: string, receiptIds: string[], onItemLinesUpdated: (itemLines: any[]) => void) => {
+  const itemLines: any[] = [];
+  for (const receiptId of receiptIds) {
+    const itemLinesRef = collection(db, 'itemLines');
+    const q = query(itemLinesRef, where('userId', '==', userId), where('receiptId', '==', receiptId), where('isRedeemed', '==', false));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const receiptItemLines = snapshot.docs.map(doc => ({ 
+        userId: doc.data().userId,
+        receiptId: doc.data().receiptId,
+        id: doc.id, 
+        itemNumber: doc.data().itemNumber,
+        itemPrice: doc.data().itemPrice,
+        quantity: doc.data().quantity,
+        couponNum: doc.data().couponNum,
+        isRedeemed: doc.data().isRedeemed,
+        itemDesc: doc.data().itemDesc,
+        availCouponAmount: doc.data().availCouponAmount,
+        origPurchasedCouponAmt: doc.data().origPurchasedCouponAmt,
+      }));
+      itemLines.push(...receiptItemLines);
+      onItemLinesUpdated(itemLines);
+    });
+    return unsubscribe;
+  }
+}
+
 // Subscribe to a single document
 export const subToDoc = (path: string, onDocUpdated: (docData: any) => void) => {
   console.log(`Fetching document from ${path}`);
@@ -70,7 +124,58 @@ export const fetchCollectionOnce = async (path: string) => {
   }));
 };
 
-// Fetch document data once
+// Fetch receipts once, for demo user
+export const fetchReceiptsOnce = async (userId: string): Promise<IReceiptItem[]> => {
+  const receiptsRef = collection(db, 'receipts');
+  const q = query(receiptsRef, where('userId', '==', userId), where('isDeleted', '==', false));
+
+  const snapshot = await getDocs(q);
+  const receipts = snapshot.docs.map(doc => ({
+    id: doc.id,
+    terminalNumber: doc.data().terminalNumber,
+    transactionNumber: doc.data().transactionNumber,
+    operatorNumber: doc.data().operatorNumber,
+    dateOfPurchase: doc.data().dateOfPurchase,
+    createdAt: doc.data().createdAt,
+    daysLeft: doc.data().daysLeft,
+    isUnlocked: doc.data().isUnlocked,
+    isRedeemed: doc.data().isRedeemed,
+    isDeleted: doc.data().isDeleted,
+    itemLines: doc.data().itemLines,
+    unlockCouponTotal: doc.data().unlockCouponTotal,
+  }));
+
+  return receipts;
+};
+
+// Fetch item lines once, for demo user
+export const fetchItemLinesOnce = async (userId: string, receiptIds: string[]) => {
+  console.log(`Fetching item lines for ${userId}`);
+  const itemLines = [];
+  for (const receiptId of receiptIds) {
+    const itemLinesRef = collection(db, 'itemLines');
+    const q = query(itemLinesRef, where('userId', '==', userId), where('receiptId', '==', receiptId), where('isRedeemed', '==', false));
+    const querySnapshot = await getDocs(q);
+    const receiptItemLines = querySnapshot.docs.map(doc => ({ 
+      userId: doc.data().userId,
+      receiptId: doc.data().receiptId,
+      id: doc.id, 
+      itemNumber: doc.data().itemNumber,
+      itemPrice: doc.data().itemPrice,
+      quantity: doc.data().quantity,
+      couponNum: doc.data().couponNum,
+      isRedeemed: doc.data().isRedeemed,
+      itemDesc: doc.data().itemDesc,
+      availCouponAmount: doc.data().availCouponAmount,
+      origPurchasedCouponAmt: doc.data().origPurchasedCouponAmt,
+    }));
+    itemLines.push(...receiptItemLines);
+  }
+  console.log(`Item lines fetched for ${userId}`);
+  return itemLines;
+};
+
+// Fetch document data once, for demo user
 export const fetchDocOnce = async (path: string) => {
   console.log(`Fetching document from ${path}`);
   const docRef = doc(db, path);
@@ -131,33 +236,32 @@ export const fetchUserData = (userId: string, onUserDataUpdated: (userData: any)
 
 
 // WRITES-----------------------------------------------------------------------
-export const markReceiptUnlocked = async (userId: string, receiptId: string, totalCouponAmount: number) => {
-  try {
-    const receiptPath = `users/${userId}/receipts/${receiptId}`;
-    const receiptRef = doc(db, receiptPath);
+// export const markReceiptUnlocked = async (userId: string, receiptId: string) => {
+//   try {
+//     const receiptPath = `users/${userId}/receipts/${receiptId}`;
+//     const receiptRef = doc(db, receiptPath);
 
-    await updateDoc(receiptRef, {
-      isUnlocked: true,
-      totalCouponAmountUnlocked: totalCouponAmount
-    });
+//     await updateDoc(receiptRef, {
+//       isUnlocked: true,
+//     });
 
-    return { success: true };
-  } catch (error) {
-    console.error("Error unlocking receipt: ", error);
-    return { success: false, error: error };
-  }
-};
+//     return { success: true };
+//   } catch (error) {
+//     console.error("Error unlocking receipt: ", error);
+//     return { success: false, error: error };
+//   }
+// };
 
-export const mergeUserSettingsInFirestore = async (userInfo: Partial<IUserInfoStore>, userId: string) => {
-  const userSettingsDocRef = doc(db, `users/${userId}/info/settings`);
+// export const mergeUserSettingsInFirestore = async (userInfo: Partial<IUserInfoStore>, userId: string) => {
+//   const userSettingsDocRef = doc(db, `users/${userId}/info/settings`);
 
-  try {
-      await setDoc(userSettingsDocRef, userInfo, { merge: true });
-      console.log(`User settings successfully updated for user ${userId}`);
-  } catch (error) {
-      console.error(`Failed to update user settings for user ${userId}:`, error);
-  }
-};
+//   try {
+//       await setDoc(userSettingsDocRef, userInfo, { merge: true });
+//       console.log(`User settings successfully updated for user ${userId}`);
+//   } catch (error) {
+//       console.error(`Failed to update user settings for user ${userId}:`, error);
+//   }
+// };
 
 
 

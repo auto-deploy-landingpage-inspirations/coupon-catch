@@ -27,11 +27,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AuthStore } from "../utils/store";
-import {
-  daysLeftForCouponRedemption,
-  daysTil30DaysFromDOfP,
-  evaluateCouponEligibilityForReceipt,
-} from "../utils/miscUtils";
+
 import DemoUINotice from "../components/DemoUINotice";
 import "../styles/ReceiptDetailPage.css";
 import { type } from "os";
@@ -44,7 +40,7 @@ import {
 import { db } from "../utils/fbFirestore";
 import { doc, deleteDoc } from "firebase/firestore";
 import ConfettiExplosion from "react-confetti-explosion";
-import { markReceiptUnlocked } from "../utils/fbFirestore";
+// import { markReceiptUnlocked } from "../utils/fbFirestore";
 import { IButtonContentProps } from "../utils/types";
 import { useHistory } from "react-router-dom";
 import ReactHowler from "react-howler";
@@ -100,25 +96,6 @@ const ReceiptDetailPage: React.FC = () => {
     return <NoReceiptComponent />; // Or some other error handling
   }
 
-  const daysLeft = daysLeftForCouponRedemption(receipt, couponList);
-
-  const totalCouponAmount = evaluateCouponEligibilityForReceipt(
-    receipt,
-    couponList
-  ).sum;
-
-  const numberOfItemsOnCoupon = evaluateCouponEligibilityForReceipt(
-    receipt,
-    couponList
-  ).count;
-
-  let couponItemsFromReceipt = evaluateCouponEligibilityForReceipt(
-    receipt,
-    couponList
-  ).items;
-
-  const receiptHasCouponItems = numberOfItemsOnCoupon > 0;
-
   const handleCheckout = async (firebaseUserId: string, receiptId: string) => {
     try {
       const response = await fetch(
@@ -142,7 +119,7 @@ const ReceiptDetailPage: React.FC = () => {
     setLoadingFor("unlockbutton");
     try {
       if (isPayingUser == true) {
-        await markReceiptUnlocked(uid, receipt.id, totalCouponAmount);
+        await markReceiptUnlocked(uid, receipt.id);
           ReceiptStore.update((s) => {
             const receiptIndex = s.receiptList.findIndex(
               (r) => r.id === receiptId
@@ -150,8 +127,6 @@ const ReceiptDetailPage: React.FC = () => {
             if (receiptIndex !== -1) {
               // Might need to cast to the correct type if TypeScript complains
               s.receiptList[receiptIndex].isUnlocked = true;
-              s.receiptList[receiptIndex].totalCouponAmountUnlocked =
-              totalCouponAmount;
             }
           });
       } else { // Demo users, and all non-premium users, show alert that says this is for paying users etc.
@@ -168,25 +143,24 @@ const ReceiptDetailPage: React.FC = () => {
     try {
       setIsExploding(true);
       setTimeout(() => setIsExploding(false), 3500);
-        if (receipt.id === "FcoblaFPX5PFjQcWtkUh" && isDemoUser) {
+      // Receipt 1 ID
+        if (receipt.id === "XXX" && isDemoUser) {
           
           ReceiptStore.update((s) => {
             const receiptIndex = s.receiptList.findIndex((r) => r.id === receiptId);
             if (receiptIndex !== -1) {
               s.receiptList[receiptIndex].isRedeemed = true;
-              s.receiptList[receiptIndex].totalCouponAmountRedeemed = totalCouponAmount;
             }
           });
           
           
           
-        } else if (receipt.id === "GLME3VtKiKPUXhxVVWdA" && isDemoUser) {
+        } else if (receipt.id === "XXX" && isDemoUser) {
+          // Receipt 2 ID
           // demo user will never see this receipts redeem button
         } else {
 
-          // addd the totalcouponamount redeeemed to the user store total in firebase
-          // await addRedeemedReceiptId(uid, receipt.id, totalCouponAmount);
-          // setUserHasUnlockedCoupons(true); // Update state to reflect the unlocked status
+
 
 
         }
@@ -212,7 +186,6 @@ const ReceiptDetailPage: React.FC = () => {
         const receiptIndex = s.receiptList.findIndex((r) => r.id === receiptId);
         if (receiptIndex !== -1) {
           s.receiptList[receiptIndex].isUnlocked = true;
-          s.receiptList[receiptIndex].totalCouponAmountUnlocked = totalCouponAmount;
         }
       });
     } 
@@ -227,7 +200,6 @@ const ReceiptDetailPage: React.FC = () => {
         const receiptIndex = s.receiptList.findIndex((r) => r.id === receiptId);
         if (receiptIndex !== -1) {
           s.receiptList[receiptIndex].isUnlocked = true;
-          s.receiptList[receiptIndex].totalCouponAmountUnlocked = totalCouponAmount;
         }
       });
     }, 5000);
@@ -236,7 +208,6 @@ const ReceiptDetailPage: React.FC = () => {
     // For all other cases (including non-demo users), trigger the checkout and unlock process
     else {
       await handleCheckout(uid, receiptId);
-      await markReceiptUnlocked(uid, receipt.id, totalCouponAmount);
     }
   };
   
@@ -291,25 +262,20 @@ const ReceiptDetailPage: React.FC = () => {
           <IonCard className="background-translucent">
             <IonCardHeader>
               <IonCardTitle>
-                {receiptHasCouponItems === false
-                  ? "No eligible items"
-                  : `$${totalCouponAmount.toFixed(
-                      2
-                    )} avail for ${daysLeft} days`}
+No eligible items or osmething
               </IonCardTitle>
               {/* <IonCardSubtitle>Card Subtitle</IonCardSubtitle> */}
             </IonCardHeader>
 
-            {!receiptHasCouponItems && (
+            {/* {!receiptHasCouponItems && (
               <NoEligibleItemsCard receipt={receipt} />
-            )}
+            )} */}
 
             {/* If receipt has coupon items avail for redemption, show this part, if not, dont */}
-            {receiptHasCouponItems && (
               <IonCardContent>
                 <IonText>
                   <h2>
-                    To claim your ${totalCouponAmount.toFixed(2)}, goto the
+                    To claim your $45.06, goto the
                     member service desk where returns are made and use this
                     information to help your cashier find your receipt.
                   </h2>
@@ -326,7 +292,7 @@ const ReceiptDetailPage: React.FC = () => {
                       loadingFor={loadingFor}
                       buttonName="unlockbutton"
                     >
-                      Unlock {numberOfItemsOnCoupon} coupons
+                      Unlock 4 coupons
                     </ButtonContent>
                   </IonButton>
                 )}
@@ -336,11 +302,11 @@ const ReceiptDetailPage: React.FC = () => {
                     <IonItem>
                       <IonLabel style={{ fontWeight: "bold" }}>
                         <h2>
-                          {receipt.dateOfPurchase} {receipt.timeOfPurchase}
+                          {/* {receipt.dateOfPurchase} {receipt.timeOfPurchase} */}
                         </h2>
                       </IonLabel>
                       <IonLabel style={{ fontWeight: "bold" }} slot="end">
-                        <h2>Total: ${receipt.totalAmount.toFixed(2)}</h2>
+                        {/* <h2>Total: ${receipt.totalAmount.toFixed(2)}</h2> */}
                       </IonLabel>
                     </IonItem>
 
@@ -372,7 +338,7 @@ const ReceiptDetailPage: React.FC = () => {
                     </IonLabel>
                   </IonListHeader>
 
-                  {/* Map couponItemsFromReceipt to the list, only for paid users to see */}
+                  {/* // Map couponItemsFromReceipt to the list, only for paid users to see */}
                   {userHasUnlockedCoupons ? (
                     couponItemsFromReceipt.map((item: any, index: any) => (
                       <IonItem key={index}>
@@ -438,7 +404,7 @@ const ReceiptDetailPage: React.FC = () => {
                   </IonButton>
                 )}
               </IonCardContent>
-            )}
+            )
           </IonCard>
 
           {/* <ReceiptList /> */}
@@ -532,7 +498,6 @@ const ReceiptDetailPage: React.FC = () => {
                 handler: () => {
                   // handleDeleteReceiptButton();
                   // markReceiptAsRedeemed():
-                  // add totalCouponAmount to user.totalSavings
                   // history.push("/dashboard/home");
                 },
               },
@@ -559,7 +524,6 @@ const ReceiptDetailPage: React.FC = () => {
                 handler: () => {
                   // handleDeleteReceiptButton();
                   // markReceiptAsRedeemed():
-                  // add totalCouponAmount to user.totalSavings
                   // history.push("/dashboard/home");
                 },
               },
