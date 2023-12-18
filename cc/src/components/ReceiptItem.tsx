@@ -1,19 +1,22 @@
 import React from 'react';
 import { IonBadge, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonIcon } from "@ionic/react";
 import { cartOutline, trashOutline } from "ionicons/icons";
-import { isOlderThan30Days } from "../utils/miscUtils";
 import { IReceiptItem } from '../utils/types';
 
 interface ReceiptItemProps {
-  receipt: IReceiptItem; // Assuming IReceiptItem is the type for receipt
+  receipt: IReceiptItem;
   mostRecentReceiptId: string | undefined;
   onReceiptClick: (id: string) => void;
   onPurchaseCouponUnlock: (id: string) => void;
   onDeleteReceipt: (id: string) => void;
 }
 
+
+
 const ReceiptItem = React.forwardRef<HTMLIonItemSlidingElement, ReceiptItemProps>(
   ({ receipt, mostRecentReceiptId, onReceiptClick, onPurchaseCouponUnlock, onDeleteReceipt }, ref) => {
+
+    // const hasValidCouponSum = receipt.couponData && typeof receipt.couponData.sum === 'number';
 
   return (
     <IonItemSliding key={receipt.id} ref={ref}>
@@ -28,27 +31,21 @@ const ReceiptItem = React.forwardRef<HTMLIonItemSlidingElement, ReceiptItemProps
         <h1
           style={{
             fontWeight: "bold",
-            color: isOlderThan30Days(receipt.dateOfPurchase)
-              ? "var(--ion-color-danger-shade)"
-              : "inherit",
+            color: "var(--ion-color-primary)",
           }}
         >
           {" "}
-          {receipt.receiptHasCouponItems === false
-            ? "No eligible items"
-            : `$${receipt.totalCouponAmount.toFixed(2)} avail for ${
-                receipt.daysLeft
-              } days`}
+              sup days left
         </h1>
         <h2>{receipt.dateOfPurchase}</h2>
       </IonLabel>
-      {receipt.couponData.sum > 0 && (
+      {receipt.unlockCouponTotal >= 0 && receipt.daysLeft >= 0 && (
         <IonBadge
           slot="end"
-          color="secondary"
+          color="primary"
           style={{ padding: ".5rem", fontSize: "1.4rem" }}
         >
-          ${receipt.couponData.sum.toFixed(2)}
+          ${receipt.unlockCouponTotal.toFixed(2)}
         </IonBadge>
       )}
     </IonItem>

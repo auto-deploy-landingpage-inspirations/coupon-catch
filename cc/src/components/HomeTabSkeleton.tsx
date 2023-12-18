@@ -1,9 +1,9 @@
-import { IonHeader, IonItem, IonLabel, IonList, IonPage, IonSkeletonText, IonTitle, IonToolbar } from '@ionic/react';
+import { IonContent, IonHeader, IonItem, IonLabel, IonList, IonPage, IonSkeletonText, IonTitle, IonToolbar } from '@ionic/react';
 import React from 'react'
 
 const HomeTabSkeleton = () => {
   return (
-  <>
+  <IonContent fullscreen>
     <IonHeader>
       <IonToolbar>
         <IonTitle>
@@ -80,7 +80,7 @@ const HomeTabSkeleton = () => {
         </IonLabel>
       </IonItem>
     </IonList>
-  </>
+    </IonContent>
   );
 };
 
