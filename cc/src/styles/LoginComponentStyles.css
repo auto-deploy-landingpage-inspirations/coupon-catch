@@ -17,12 +17,9 @@
   }
   
   .loginBtn {
-    /* --background: white; */
-    /* --border-color: #747775; */
     --border-radius: 4px;
-    /* --border-width: 1px; */
-    --box-shadow: none;
     --color: var(--ion-color-dark);
+    --box-shadow: none;
     --padding-top: 0;
     --padding-bottom: 0;
     --padding-left: 0;
@@ -52,12 +49,8 @@
     --font-size: 14px;
   }
   .googleloginBtn {
-    /* --background: white; */
-    /* --border-color: #747775; */
     --border-radius: 4px;
-    /* --border-width: 1px; */
     --box-shadow: none;
-    --color: #1f1f1f;
     --padding-top: 0;
     --padding-bottom: 0;
     --padding-left: 0;
@@ -117,9 +110,4 @@
     .custom-ripple-none{
       --ripple-color: transparent;
       --background-hover: transparent;
-  }
-
-
-  body.dark .loginBtn {
-    --color: var(--ion-color-light);
   }
