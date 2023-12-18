@@ -25,6 +25,7 @@ import { LoginOrSignupStore } from '../utils/store';
 import { auth, createUserWithEmailAndPassword, updateProfile } from "../utils/fbAuth";
 import { download } from "ionicons/icons";
 import TermsModal from "./TermsModal";
+import { hi } from "date-fns/locale";
 
 // Required interface for ButtonContent component
 interface IButtonContentProps {
@@ -100,10 +101,6 @@ const SignUpPage: React.FC<SignUpComponentProps> = ({ toggleLogin }) => {
     isEmail(value) ? setIsEmailValid(true) : setIsEmailValid(false);
   };
 
-    function handleDownloadTandCPDF() {
-      // download link for pdf of terms and conditions stored in "../../public/CCTermsandConditions.pdf"
-    };
-
     // Allows Modal to be closed?
     function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
       if (ev.detail.role === "confirm") {
@@ -154,11 +151,11 @@ const SignUpPage: React.FC<SignUpComponentProps> = ({ toggleLogin }) => {
     );
   };
 
-  const switchToLogin = () => {
-    LoginOrSignupStore.update(s => {
-      s.isLogin = true;
-    });
-  };
+  // const switchToLogin = () => {
+  //   LoginOrSignupStore.update(s => {
+  //     s.isLogin = true;
+  //   });
+  // };
 
   
   const handleEmailPasswordSignUp = async () => {
@@ -197,6 +194,7 @@ const SignUpPage: React.FC<SignUpComponentProps> = ({ toggleLogin }) => {
         await signInWithPopup(auth, new GoogleAuthProvider());
   
         // ... any post-signIn logic if needed
+        // route to home page?
       } catch (error) {
         // Handle error accordingly
         console.error("Error signing in with Google", error);
