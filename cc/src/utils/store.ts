@@ -1,6 +1,14 @@
 import { Store } from "pullstate";
 import { IReceiptItem } from "../utils/types";
 
+export interface IDarkModeStore {
+  darkMode: boolean;
+}
+
+export const DarkModeStore = new Store<IDarkModeStore>({
+  darkMode: false,
+});
+
 export interface IAuthStore {
   couponsChecked: boolean,
   isAuthed: boolean;
@@ -40,25 +48,19 @@ export const CouponStore = new Store<ICouponStore>({
 export interface IUserInfoStore {
   name: string;
   email: string;
-  totalRedeemedAmount: number;
-  totalUnlockedAmount: number;
-  totalReceiptsRedeemed: number;
-  totalReceiptsUnlocked: number;
   prefersDarkMode: boolean;
   isDemoCouponApplied: boolean;
   isPayingUser: boolean;
   sp_subscriptionId: string;
   sp_customerId: string;
+  
 }
 
 export const UserInfoStore = new Store<IUserInfoStore>({
   name: "",
   email: "",
-  totalRedeemedAmount: 0,
-  totalUnlockedAmount: 0,
-  totalReceiptsRedeemed: 0,
-  totalReceiptsUnlocked: 0,
-  prefersDarkMode: false,
+  // Use system level dark mode settings as default, but allow user to override
+  prefersDarkMode: window.matchMedia('(prefers-color-scheme: dark)').matches,
   isDemoCouponApplied: false,
   isPayingUser: false,
   sp_subscriptionId: "",

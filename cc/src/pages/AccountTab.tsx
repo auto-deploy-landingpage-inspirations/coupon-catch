@@ -31,6 +31,7 @@ import { useEffect } from "react";
 import DemoUINotice from "../components/DemoUINotice";
 import { UserInfoStore } from "../utils/store";
 import AmountSaved from "../components/AmountSaved";
+import { DarkModeStore } from "../utils/store";
 
 interface IButtonContentProps {
   loadingFor: string;
@@ -41,7 +42,7 @@ interface IButtonContentProps {
 
 const AccountTab: React.FC = () => {
   const [activeChip, setActiveChip] = useState("month"); // Default active chip
-  const darkModeEnabled = UserInfoStore.useState((s) => s.prefersDarkMode);
+  const darkModeEnabled = DarkModeStore.useState((s) => s.darkMode);
   const history = useHistory();
   // const darkModeEnabled = AuthStore.useState(s => s.darkModeEnabled);
   const user = AuthStore.useState((s) => s.user);
@@ -65,34 +66,18 @@ const AccountTab: React.FC = () => {
 
   const [loadingFor, setLoadingFor] = useState("");
 
-  const toggleDarkMode = (ev: ToggleCustomEvent) => {
-    // Update darkModeEnabled in AuthStore
-    UserInfoStore.update((s) => {
-      s.prefersDarkMode = ev.detail.checked;
-    });
-    // Apply the theme based on the updated state
-    toggleDarkTheme(ev.detail.checked);
-  };
-
+  // Keeps dark mode button enabled for system-level dark mode users
   useEffect(() => {
-    // Check if the user prefers a dark color scheme
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    // Update the state and the document body class
-    UserInfoStore.update((s) => {
-      s.prefersDarkMode = prefersDark;
-    });
-    toggleDarkTheme(prefersDark);
-  }, []); // Run the effect only once when the component mounts
+    // Apply the dark theme if necessary
+    document.body.classList.toggle("dark", darkModeEnabled);
+  }, [darkModeEnabled]); // Run the effect whenever darkModeEnabled changes
 
-  // Add or remove the "dark" class on the document body
-  const toggleDarkTheme = (shouldAdd: boolean) => {
+  const toggleDarkMode = (ev: ToggleCustomEvent) => {
+    const shouldAdd = ev.detail.checked;
+    // Update darkModeEnabled in UserInfoStore
+    DarkModeStore.update(s => { s.darkMode = shouldAdd; });
     document.body.classList.toggle("dark", shouldAdd);
   };
-
-  useEffect(() => {
-    toggleDarkTheme(darkModeEnabled);
-  }, [darkModeEnabled]); // Re-run the effect when darkModeEnabled changes
 
   // Function to resend the email verification link
   const handleResendEmail = async () => {
@@ -184,32 +169,6 @@ const AccountTab: React.FC = () => {
         <hr style={{ border: 'none', height: '1px', backgroundColor: '#c8c7cc', margin: '0' }} />
 
         <IonList>
-          {/* <IonItem>
-            <IonLabel slot="end">
-              
-              <IonChip
-              className="chip-style"
-                onClick={() => handleChipClick("month")}
-                outline={activeChip !== "month"}
-              >
-                month
-              </IonChip>
-              <IonChip
-              className="chip-style"
-                onClick={() => handleChipClick("year")}
-                outline={activeChip !== "year"}
-              >
-                year
-              </IonChip>
-              <IonChip
-              className="chip-style"
-                onClick={() => handleChipClick("all-time")}
-                outline={activeChip !== "all-time"}
-              >
-                all-time
-              </IonChip>
-            </IonLabel>
-          </IonItem> */}
 
           <IonItemGroup>
             <IonList>

@@ -59,7 +59,7 @@ import { db } from "./utils/fbFirestore";
 import { collection, query, where, getDocs, doc } from "firebase/firestore"; 
 import { listeners } from "process";
 import { differenceInDays, addDays, parse } from 'date-fns';
-
+import { DarkModeStore } from "./utils/store";
 
 
 setupIonicReact({
@@ -78,6 +78,19 @@ const App: React.FC = () => {
   const uid = AuthStore.useState((s) => s.uid);
 const receiptList = ReceiptStore.useState((s) => s.receiptList);
 const [isCouponListLoading, setIsCouponListLoading] = useState(true);
+
+// useEffect for dark mode handling
+useEffect(() => {
+  const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+  // Update the state in the UserInfoStore
+  DarkModeStore.update((s) => {
+    s.darkMode = prefersDarkMode;
+  });
+
+    // Apply the dark theme if necessary
+    document.body.classList.toggle("dark", prefersDarkMode);
+  }, []); // Run the effect only once when the component mounts
 
   // useEffect for handling Auth via Firebase live listener
   useEffect(() => {
