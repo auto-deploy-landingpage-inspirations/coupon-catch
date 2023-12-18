@@ -82,18 +82,18 @@ const AddTab: React.FC = () => {
       if (response.ok) {
         const resultText = await response.text(); // Get the text response
         
-
         try {
           const result = JSON.parse(resultText); // Try to parse it as JSON
       
           if (result && result.receipt) {
             // Generate a random 4-digit number and assign it as the id of the receipt
             const randomId = Math.floor(1000 + Math.random() * 9000); // Generates a number between 1000 and 9999
-            // ADD FIELDS TO THE RECEIPT OBJECT
             result.receipt.id = `useradded${randomId}`;
+      
+            // Attach item lines to the receipt
+            result.receipt.itemLines = result.itemLines;
+      
             // Add the receipt to the user's receipts 
-            console.log("Receipt:", result.receipt);
-            // Update demoReceipts with the modified receipt
             ReceiptStore.update((s) => {
               s.receiptList.push(result.receipt);
             });

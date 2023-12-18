@@ -30,8 +30,6 @@ import { AuthStore } from "../utils/store";
 import { useEffect } from "react";
 import DemoUINotice from "../components/DemoUINotice";
 import { UserInfoStore } from "../utils/store";
-import { UserInfo } from "firebase-admin/lib/auth/user-record";
-import CountUp from "react-countup";
 import AmountSaved from "../components/AmountSaved";
 
 interface IButtonContentProps {
