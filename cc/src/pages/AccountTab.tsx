@@ -38,6 +38,7 @@ interface IButtonContentProps {
   children: ReactNode;
 }
 
+
 const AccountTab: React.FC = () => {
   const [activeChip, setActiveChip] = useState("month"); // Default active chip
   const darkModeEnabled = UserInfoStore.useState((s) => s.prefersDarkMode);
@@ -72,6 +73,17 @@ const AccountTab: React.FC = () => {
     // Apply the theme based on the updated state
     toggleDarkTheme(ev.detail.checked);
   };
+
+  useEffect(() => {
+    // Check if the user prefers a dark color scheme
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    // Update the state and the document body class
+    UserInfoStore.update((s) => {
+      s.prefersDarkMode = prefersDark;
+    });
+    toggleDarkTheme(prefersDark);
+  }, []); // Run the effect only once when the component mounts
 
   // Add or remove the "dark" class on the document body
   const toggleDarkTheme = (shouldAdd: boolean) => {
