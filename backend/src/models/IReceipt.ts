@@ -1,4 +1,5 @@
 export interface IReceipt {
+  userId: string;
     supplier: string;
     barcodeNumber: string;
     storeAddress: string;
@@ -9,17 +10,25 @@ export interface IReceipt {
     terminalNumber: number;
     transactionNumber: number;
     operatorNumber: number;
-    dateOfPurchase: string;
     timeOfPurchase: string;
     numberOfItems: number;
     subTotal: number;
     taxAmount: number;
     totalAmount: number;
     execCheckAmount: number;
-    isDeleted: boolean;
+    // Stuff to send to the client for UI display
+    // date of creation of each receipt
     createdAt: string;
+    // ID's of each of the numberOfReceipts
+    receiptIds: string[];
+    // date of purchase
+    dateOfPurchase: string;
+    // days left til the coupon adjustment expires
     daysLeft: number;
+    // is deleted
+    isDeleted: boolean;
     isUnlocked: boolean;
+    unlockCouponTotal: number;
     isRedeemed: boolean;
-    totalCouponAmount: number;
+    itemLines: [];
   }

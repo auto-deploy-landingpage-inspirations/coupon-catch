@@ -1,8 +1,8 @@
-export interface ICoupon {
+export interface ICouponItem {
     itemNumber: number;
     discount: number;
-    couponEndDate: string;
     couponStartDate: string;
     desc: string;
     daysLeft: number;
+    // endDate: string;
 }
