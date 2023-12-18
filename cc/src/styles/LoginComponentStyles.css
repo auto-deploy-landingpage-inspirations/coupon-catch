@@ -74,7 +74,7 @@
     transition: background-color .218s, border-color .218s, box-shadow .218s;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
-    background-image: url('googleSignIn.png');
+    background-image: url('../../public/googleSignIn.png');
     background-size: cover; /* this will make the image cover the entire button */
     background-position: center; /* centers the background image */
     background-repeat: no-repeat;
