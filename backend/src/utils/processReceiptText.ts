@@ -22,11 +22,13 @@ import {
   // extractStoreNumber,
   // extractMemberNumber,
 } from "./regexParsing";
+import { ICoupon } from "../models/Coupon";
+import { ICouponItem } from "../models/ICouponItem";
 
 // Setup interface for receipt
 
 
-function processReceiptText(text: string): {
+function processReceiptText(text: string, uid: string): {
   updatedText: string;
   receipt: IReceipt;
   couponAmounts: number[];
@@ -38,6 +40,7 @@ function processReceiptText(text: string): {
 
   // Initialize a receipt object with default values
   let receipt: IReceipt = {
+    userId: uid,
     supplier: "",
     barcodeNumber: "",
     storeAddress: "",
@@ -45,22 +48,25 @@ function processReceiptText(text: string): {
     memberNumber: 0,
     storeNumber: "",
     storeName: "",
-    terminalNumber: 0,
+    terminalNumber: 0, 
     transactionNumber: 0,
     operatorNumber: 0,
-    dateOfPurchase: "",
-    subTotal: 0,
     timeOfPurchase: "",
     numberOfItems: 0,
+    subTotal: 0,
     execCheckAmount: 0,
     taxAmount: 0,
     totalAmount: 0,
+    // front end stuff
     createdAt: "",
+    receiptIds: [],
+    dateOfPurchase: "",
+    unlockCouponTotal: 0,
     daysLeft: 0,
+    isDeleted: false,
     isUnlocked: false,
     isRedeemed: false,
-    isDeleted: false,
-    totalCouponAmount: 0,
+    itemLines: [],
   };
   
   // remove non-capture lines
@@ -215,6 +221,8 @@ function processReceiptText(text: string): {
       Math.abs(amount - receipt.totalAmount) >= epsilon
   );
 
+  receipt.createdAt = new Date().toISOString();
+
   // Remove any emtpty lines
   updatedText = updatedText.replace(/^\s*[\r\n]/gm, "");
   // remove all occurences of * characters
@@ -247,17 +255,19 @@ console.log("This is text left before line items are ran\n\n\n\n\n\n\n\n", updat
 
   
   // Utility function to create a new line item
-  function createLineItem(receiptId: string, itemNumber: number, itemDesc: string): ILineItem {
+  function createLineItem(userId: string, receiptId: string, itemNumber: number, itemDesc: string): ILineItem {
     return {
+      userId,
       receiptId,
       itemNumber,
       itemDesc: itemDesc.trim(),
       couponNum: "",
-      origPurchasedCouponAmt: "",
+      origPurchasedCouponAmt: 0,
       itemPrice: 0,
       quantity: 1,
       isUnlocked: false,
       isRedeemed: false,
+      availCouponAmount: 0,
     };
   }
   
@@ -271,6 +281,7 @@ console.log("This is text left before line items are ran\n\n\n\n\n\n\n\n", updat
 
 
 function processReceiptItemLines(
+  uid: string,
   updatedText: string,
   receiptId: string,
   multiplierLines: any[],
@@ -294,7 +305,7 @@ let remainingText = updatedText;
       ) {
         const itemNumber = parseInt(regexMatch[1], 10);
         const itemDesc = regexMatch[2];
-        const newItem = createLineItem(receiptId, itemNumber, itemDesc);
+        const newItem = createLineItem(uid, receiptId, itemNumber, itemDesc);
         itemLines.push(newItem);
         remainingText = remainingText.replace(regexMatch[0], "").replace(/(\r?\n){2,}/g, "\n");
       }
@@ -334,7 +345,7 @@ if (itemLines.length < numberOfItemsOnReceipt) {
         ) {
           const itemNumber = parseInt(lineItemRegexTwoMatch[1], 10);
           const itemDesc = lineItemRegexTwoMatch[2];
-          const newItem = createLineItem(receiptId, itemNumber, itemDesc);
+          const newItem = createLineItem(uid, receiptId, itemNumber, itemDesc);
           itemLines.push(newItem); // Pushing directly to itemLines
           remainingTextTwo = remainingTextTwo.replace(lineItemRegexTwoMatch[0], "").replace(/(\r?\n){2,}/g, "\n");
         }
@@ -376,7 +387,7 @@ numberOfItemsOnReceipt = processMultiplierLines(multiplierLines, itemLines);
       couponLines.push({ couponNumber, itemNumber });
     }
   }
-
+console.log("Coupon lines", couponLines);
   couponLines.forEach(({ couponNumber, itemNumber }) => {
     itemLines.forEach((item) => {
       if (item.itemNumber === parseInt(itemNumber)) {
@@ -385,13 +396,10 @@ numberOfItemsOnReceipt = processMultiplierLines(multiplierLines, itemLines);
     });
   });
 
-
   itemLines = assignCouponsToItems(itemLines, couponAmounts);
-
 
   const result = processDollarAmounts(dollarAmounts, itemLines);
   itemLines = result.itemLines;
-
 
   return { updatedItemLines: itemLines };
 }
