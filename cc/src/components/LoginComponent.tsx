@@ -171,11 +171,18 @@ const LoginComponent: React.FC<LoginComponentProps> = ({ toggleLogin }) => {
     }
   };
 
+  // Add this function to handle form submission
+const handleFormSubmit = (event: React.FormEvent) => {
+  event.preventDefault(); // Prevent the page from refreshing
+  handleEmailPasswordSignIn();
+};
+
   return (
     <div>
       <IonText color="primary" class="ion-text-center">
         <h1>Welcome back</h1>
       </IonText>
+      <form onSubmit={handleFormSubmit}>
 
       <div style={{ padding: "0" }}>
         <EmailInput email={emailField} onEmailChange={handleEmailChange} />
@@ -258,8 +265,9 @@ const LoginComponent: React.FC<LoginComponentProps> = ({ toggleLogin }) => {
           <IonText>Sign in with email</IonText>
         </ButtonContent>
       </IonButton>
+      
         </div>
-
+</form>
       <Divider>OR</Divider>
 
       <div
