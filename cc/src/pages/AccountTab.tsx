@@ -31,7 +31,7 @@ import { useEffect } from "react";
 import DemoUINotice from "../components/DemoUINotice";
 import { UserInfoStore } from "../utils/store";
 import AmountSaved from "../components/AmountSaved";
-import { DarkModeStore } from "../utils/store";
+// import { DarkModeStore } from "../utils/store";
 
 interface IButtonContentProps {
   loadingFor: string;
@@ -42,9 +42,8 @@ interface IButtonContentProps {
 
 const AccountTab: React.FC = () => {
   const [activeChip, setActiveChip] = useState("month"); // Default active chip
-  const darkModeEnabled = DarkModeStore.useState((s) => s.darkMode);
+  // const darkModeEnabled = DarkModeStore.useState((s) => s.darkMode);
   const history = useHistory();
-  // const darkModeEnabled = AuthStore.useState(s => s.darkModeEnabled);
   const user = AuthStore.useState((s) => s.user);
 
   const [showActionSheet, setShowActionSheet] = useState(false);
@@ -67,17 +66,17 @@ const AccountTab: React.FC = () => {
   const [loadingFor, setLoadingFor] = useState("");
 
   // Keeps dark mode button enabled for system-level dark mode users
-  useEffect(() => {
-    // Apply the dark theme if necessary
-    document.body.classList.toggle("dark", darkModeEnabled);
-  }, [darkModeEnabled]); // Run the effect whenever darkModeEnabled changes
+  // useEffect(() => {
+  //   // Apply the dark theme if necessary
+  //   document.body.classList.toggle("dark", darkModeEnabled);
+  // }, [darkModeEnabled]); // Run the effect whenever darkModeEnabled changes
 
-  const toggleDarkMode = (ev: ToggleCustomEvent) => {
-    const shouldAdd = ev.detail.checked;
-    // Update darkModeEnabled in UserInfoStore
-    DarkModeStore.update(s => { s.darkMode = shouldAdd; });
-    document.body.classList.toggle("dark", shouldAdd);
-  };
+  // const toggleDarkMode = (ev: ToggleCustomEvent) => {
+  //   const shouldAdd = ev.detail.checked;
+  //   // Update darkModeEnabled in UserInfoStore
+  //   DarkModeStore.update(s => { s.darkMode = shouldAdd; });
+  //   document.body.classList.toggle("dark", shouldAdd);
+  // };
 
   // Function to resend the email verification link
   const handleResendEmail = async () => {
@@ -191,13 +190,13 @@ const AccountTab: React.FC = () => {
                 </IonLabel>
               </IonItem>
             </IonList>
-            <IonItem>
+            {/* <IonItem>
               <IonToggle checked={darkModeEnabled} onIonChange={toggleDarkMode}>
                 <IonLabel>
                   <h2>Dark mode</h2>
                 </IonLabel>
               </IonToggle>
-            </IonItem>
+            </IonItem> */}
           </IonItemGroup>
 
           <IonItemGroup>
