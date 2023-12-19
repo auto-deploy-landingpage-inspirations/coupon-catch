@@ -34,12 +34,18 @@ const ReceiptItem = React.forwardRef<HTMLIonItemSlidingElement, ReceiptItemProps
             color: "var(--ion-color-primary)",
           }}
         >
-          {" "}
-              sup days left
+          {/* if daysLeft is <= 0 OR unlockedCouponTotal == 0 , dipslay "No eligible items"
+          then if daysLeft is > 0 AND unlockedCouponTotal > 0, display "x days to redeem"
+          */}
+          {receipt.daysLeft <= 0 || receipt.unlockCouponTotal === 0
+            ? "No eligible items"
+            : receipt.daysLeft > 0 && receipt.unlockCouponTotal > 0
+            ? `${receipt.daysLeft} days to redeem`
+            : "No eligible items"}
         </h1>
         <h2>{receipt.dateOfPurchase}</h2>
       </IonLabel>
-      {receipt.unlockCouponTotal >= 0 && receipt.daysLeft >= 0 && (
+      {receipt.unlockCouponTotal > 0 && receipt.daysLeft >= 0 && (
         <IonBadge
           slot="end"
           color="primary"
