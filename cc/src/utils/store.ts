@@ -52,7 +52,6 @@ export const CouponStore = new Store<ICouponStore>({
 export interface IUserInfoStore {
   name: string;
   email: string;
-  // prefersDarkMode: boolean;
   isDemoCouponApplied: boolean;
   isPayingUser: boolean;
   sp_subscriptionId: string;
@@ -63,8 +62,6 @@ export interface IUserInfoStore {
 export const UserInfoStore = new Store<IUserInfoStore>({
   name: "",
   email: "",
-  // Use system level dark mode settings as default, but allow user to override
-  // prefersDarkMode: window.matchMedia('(prefers-color-scheme: dark)').matches,
   isDemoCouponApplied: false,
   isPayingUser: false,
   sp_subscriptionId: "",

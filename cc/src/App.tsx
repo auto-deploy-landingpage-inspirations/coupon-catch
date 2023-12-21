@@ -54,11 +54,9 @@ import { ReceiptStore } from "./utils/store";
 import { CouponStore } from "./utils/store";
 import { updateUserSettings } from "./utils/miscUtils";
 import { auth } from "./utils/fbAuth";
-import { db } from "./utils/fbFirestore";
-import { collection, query, where, getDocs, doc } from "firebase/firestore"; 
 import { listeners } from "process";
 import { differenceInDays, addDays, parse } from 'date-fns';
-// import { DarkModeStore } from "./utils/store";
+import { DarkModeStore } from "./utils/store";
 import { ICouponList } from "./utils/types";
 
 setupIonicReact({
@@ -79,16 +77,30 @@ const isCouponLoaded = CouponStore.useState((s) => s.isLoaded);
 const isReceiptsLoaded = ReceiptStore.useState((s) => s.isLoaded);
 
 // useEffect for dark mode handling
-// useEffect(() => {
-//   const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
-//   // Update the state in the UserInfoStore
-//   DarkModeStore.update((s) => {
-//     s.darkMode = prefersDarkMode;
-//   });
+useEffect(() => {
+  // Create a MediaQueryList object
+  const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-//     // Apply the dark theme if necessary
-//     document.body.classList.toggle("dark", prefersDarkMode);
-//   }, []); // Run the effect only once when the component mounts
+  // Function to update dark mode state
+  const updateDarkMode = (e: MediaQueryListEvent) => {
+    const prefersDarkMode = e.matches;
+    DarkModeStore.update((s) => {
+      s.darkMode = prefersDarkMode;
+    });
+    document.body.classList.toggle("dark", prefersDarkMode);
+  };
+
+  // Set initial dark mode state
+  updateDarkMode({ matches: darkModeMediaQuery.matches } as MediaQueryListEvent);
+
+  // Add listener to update dark mode state when the system's color scheme changes
+  darkModeMediaQuery.addEventListener('change', updateDarkMode);
+
+  // Clean up listener on unmount
+  return () => {
+    darkModeMediaQuery.removeEventListener('change', updateDarkMode);
+  };
+}, []); // Run the effect only once when the component mounts
 
   // useEffect for handling Auth via Firebase live listener
   useEffect(() => {
