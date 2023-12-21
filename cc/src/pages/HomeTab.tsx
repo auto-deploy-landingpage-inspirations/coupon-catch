@@ -4,6 +4,7 @@ import {
   IonContent,
   IonHeader,
   IonPage,
+  IonText,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
@@ -159,13 +160,14 @@ const HomeTab: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-      <ReceiptList 
+        <IonText>Hello</IonText>
+      {/* <ReceiptList 
           receipts={receipts}
           mostRecentReceiptId={mostRecentReceiptId}
           onReceiptClick={handleReceiptClick}
           onPurchaseCouponUnlock={handlePurchaseCouponUnlock}
           onDeleteReceipt={handleDeleteReceipt}
-        />
+        /> */}
 
         {/* Include the DemoAccountNotice component */}
         <DemoUINotice uid={user.uid} />
