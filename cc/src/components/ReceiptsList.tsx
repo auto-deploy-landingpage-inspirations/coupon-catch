@@ -19,7 +19,7 @@ const ReceiptList: React.FC<ReceiptListProps> = ({
   onPurchaseCouponUnlock,
   onDeleteReceipt,
 }) => {
-    const animatedItemRef = useRef<HTMLIonItemSlidingElement>(null);
+    // const animatedItemRef = useRef<HTMLIonItemSlidingElement>(null);
  console.log("receipts at ReceiptList: ", receipts)
     console.log("ReceiptList component rendering");
   return (
@@ -32,7 +32,7 @@ const ReceiptList: React.FC<ReceiptListProps> = ({
           onReceiptClick={onReceiptClick}
           onPurchaseCouponUnlock={onPurchaseCouponUnlock}
           onDeleteReceipt={onDeleteReceipt}
-          ref={receipt.id === mostRecentReceiptId ? animatedItemRef : undefined}
+          // ref={receipt.id === mostRecentReceiptId ? animatedItemRef : undefined}
         />
       ))}
     </IonList>

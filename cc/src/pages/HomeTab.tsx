@@ -48,7 +48,7 @@ const HomeTab: React.FC = () => {
   };
 
   // useRef to track the element
-    const animatedItemRef = useRef<any>(null);
+    // const animatedItemRef = useRef<any>(null);
 
     // useEffect(() => {
     //   const recentId = getMostRecentReceiptId(receipts);
