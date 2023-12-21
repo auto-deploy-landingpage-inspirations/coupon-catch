@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   IonCard,
   IonCardContent,
@@ -38,7 +38,7 @@ const EligibleItemsCard: React.FC<EligibleItemsCardProps> = ({
   const isDemoUser = AuthStore.useState((s) => s.isDemoUser);
   const uid = AuthStore.useState((s) => s.uid);
 
-  const handleUnlockCouponsButton = async () => {
+  const handleUnlockCouponsButton = useCallback(async () => {
     setLoadingFor("unlockbutton");
     try {
       if (isPayingUser != true) {
@@ -60,10 +60,11 @@ const EligibleItemsCard: React.FC<EligibleItemsCardProps> = ({
       console.error("Error in handleUnlockCouponsButton:", error);
     }
     setLoadingFor("");
-  };
+  }, [isPayingUser, uid, receipt.id, setUnpaidShowAlert]);
 
 
-  const handleRedeemCouponsButton = async () => {
+
+  const handleRedeemCouponsButton = useCallback(async () => {
     setLoadingFor("redeembutton");
     try {
       setIsExploding(true);
@@ -94,7 +95,7 @@ const EligibleItemsCard: React.FC<EligibleItemsCardProps> = ({
       setLoadingFor("");
       setShowRedeemedAlert(true);
     }
-  };
+  }, [receipt.id, isDemoUser, setShowRedeemedAlert]);
 
   return (
     <IonCard className="background-translucent">
