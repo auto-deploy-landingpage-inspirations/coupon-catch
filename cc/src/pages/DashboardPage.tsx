@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { Suspense, lazy, useEffect } from "react";
 import {
   IonPage,
   IonTabs,
@@ -10,13 +10,13 @@ import {
   IonLoading,
 } from "@ionic/react";
 import { Redirect, Route } from "react-router-dom";
-import HomeTab from "./HomeTab";
-import AddTab from "./AddTab";
-import SaleTab from "./SaleTab";
-import SaleDetailPage from "./SaleDetailPage";
-import AccountTab from "./AccountTab";
-import ReceiptDetailPage from "./ReceiptDetailPage";
-import EditProfilePage from "./EditProfilePage";
+const HomeTab = lazy(() => import('./HomeTab'));
+const AddTab = lazy(() => import('./AddTab'));
+const SaleTab = lazy(() => import('./SaleTab'));
+const SaleDetailPage = lazy(() => import('./SaleDetailPage'));
+const AccountTab = lazy(() => import('./AccountTab'));
+const ReceiptDetailPage = lazy(() => import('./ReceiptDetailPage'));
+const EditProfilePage = lazy(() => import('./EditProfilePage'));
 import { home, add, newspaper, person } from "ionicons/icons";
 import ProtectedRoute from "../layouts/ProtectedRoutes";
 
@@ -28,6 +28,7 @@ console.log("DashboardPage loaded");
       <IonTabs>
         {/* Router Outlet for Tabs */}
         <IonRouterOutlet>
+        <Suspense fallback={<IonLoading isOpen={true} message={'Loading...'} />}>
           <Redirect exact from="/dashboard" to="/dashboard/home" />
           <ProtectedRoute exact path="/dashboard/home" component={HomeTab} />
           <ProtectedRoute
@@ -56,6 +57,7 @@ console.log("DashboardPage loaded");
           <Route exact path="/dashboard">
             <Redirect to="/dashboard/home" />
           </Route>
+          </Suspense>
         </IonRouterOutlet>
 
         {/* Tab Bar */}
