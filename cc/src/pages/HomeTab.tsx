@@ -30,11 +30,11 @@ const HomeTab: React.FC = () => {
   const receipts = ReceiptStore.useState((s) => s.receiptList);
   const user = AuthStore.useState((s) => s.user);
   const isDemoUser = AuthStore.useState((s) => s.isDemoUser);
-  const [mostRecentReceiptId, setMostRecentReceiptId] = useState<
-    string | undefined
-  >(undefined);
+  // const [mostRecentReceiptId, setMostRecentReceiptId] = useState<
+  //   string | undefined
+  // >(undefined);
   // Use a state to track when the ref is attached and trigger the animation after the attachment.
-    const [shouldAnimate, setShouldAnimate] = useState(false);
+    // const [shouldAnimate, setShouldAnimate] = useState(false);
   
   const getMostRecentReceiptId = (
     receipts: IReceiptItem[] | undefined
@@ -50,38 +50,38 @@ const HomeTab: React.FC = () => {
   // useRef to track the element
     const animatedItemRef = useRef<any>(null);
 
-    useEffect(() => {
-      const recentId = getMostRecentReceiptId(receipts);
-      setMostRecentReceiptId(recentId);
+    // useEffect(() => {
+    //   const recentId = getMostRecentReceiptId(receipts);
+    //   setMostRecentReceiptId(recentId);
 
-      const recentReceipt = receipts.find((r) => r.id === recentId);
-      if (recentReceipt) {
-        const receiptDate = new Date(recentReceipt.createdAt);
-        const now = new Date();
-        const timeDiff = now.getTime() - receiptDate.getTime();
+    //   const recentReceipt = receipts.find((r) => r.id === recentId);
+    //   if (recentReceipt) {
+    //     const receiptDate = new Date(recentReceipt.createdAt);
+    //     const now = new Date();
+    //     const timeDiff = now.getTime() - receiptDate.getTime();
 
-        if (timeDiff < 1 * 60 * 1000) {
-          // 1 minute in milliseconds
-          setShouldAnimate(true);
+    //     if (timeDiff < 1 * 60 * 1000) {
+    //       // 1 minute in milliseconds
+    //       setShouldAnimate(true);
 
-          if (animatedItemRef.current) {
-            // Stage manager enters, does the magic
-            const anim = createAnimation()
-              .addElement(animatedItemRef.current as HTMLIonItemElement)
-              .duration(3000)
-              .fromTo(
-                "background",
-                "var(--ion-color-primary)",
-                "var(--ion-item-background, white)"
-              );
-            anim.play();
+    //       if (animatedItemRef.current) {
+    //         // Stage manager enters, does the magic
+    //         const anim = createAnimation()
+    //           .addElement(animatedItemRef.current as HTMLIonItemElement)
+    //           .duration(3000)
+    //           .fromTo(
+    //             "background",
+    //             "var(--ion-color-primary)",
+    //             "var(--ion-item-background, white)"
+    //           );
+    //         anim.play();
 
-            // Curtain falls, show's over
-            setShouldAnimate(false);
-          }
-        }
-      }
-    }, [receipts]); // dependencies: just receipts, keep it simple, stupid
+    //         // Curtain falls, show's over
+    //         setShouldAnimate(false);
+    //       }
+    //     }
+    //   }
+    // }, [receipts]); // dependencies: just receipts, keep it simple, stupid
 
   const handleReceiptClick = (id: string) => {
     // Navigate to reciept details page
