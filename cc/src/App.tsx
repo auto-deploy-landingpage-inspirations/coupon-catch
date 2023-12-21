@@ -3,7 +3,6 @@ import {
   IonRouterOutlet,
   setupIonicReact,
   IonLoading,
-  IonSpinner,
   IonHeader,
   IonToolbar,
   IonButtons,
@@ -60,7 +59,7 @@ import { collection, query, where, getDocs, doc } from "firebase/firestore";
 import { listeners } from "process";
 import { differenceInDays, addDays, parse } from 'date-fns';
 // import { DarkModeStore } from "./utils/store";
-
+import { ICouponList } from "./utils/types";
 
 setupIonicReact({
   mode: "ios", // 'md' for Material Design, 'ios' for iOS design
@@ -178,19 +177,20 @@ const calculateReceiptFields = (receipts: IReceiptItem[]) => {
     const date30DaysFromPurchase = addDays(dateOfPurchase, 30);
     let daysFromDoP = differenceInDays(date30DaysFromPurchase, currentDate);
 
-    receipt.unlockCouponTotal = receipt.itemLines.reduce((total, itemLine) => {
+    receipt.itemLines.forEach(itemLine => {
       const coupon = couponList.find(coupon => coupon.itemNumber === itemLine.itemNumber);
       if (coupon) {
         if (typeof coupon.discount === 'number') {
-          return total + coupon.discount;
+          itemLine.availCouponAmount += coupon.discount; // add the discount to the availCouponAmount
         } else {
           console.error(`Invalid discount for itemNumber ${itemLine.itemNumber}: ${coupon.discount}`);
         }
       } else {
         // console.warn(`No coupon found for itemNumber ${itemLine.itemNumber}`);
       }
-      return total;
-    }, 0);
+    });
+    receipt.unlockCouponTotal = receipt.itemLines.reduce((total, itemLine) => total + Number(itemLine.availCouponAmount), 0);
+
 
     receipt.daysLeft = Math.max(0, Math.min(daysFromDoP, daysToCouponEnd));
   });
@@ -302,7 +302,7 @@ const calculateReceiptFields = (receipts: IReceiptItem[]) => {
     receiptIndex: any,
     daysAgo: number,
     numberOfCoupons: number = 0,
-    couponList: any[]
+    couponList: typeof ICouponList
   ) => {
     // Update the date of purchase
     const receiptDate = new Date();
@@ -343,8 +343,8 @@ const calculateReceiptFields = (receipts: IReceiptItem[]) => {
               const itemLine = receipt.itemLines[index];
 
               // Update item number and coupon amount
-              itemLine.itemNumber = String(coupon.itemNumber);
-              itemLine.availCouponAmount = String(coupon.discount);
+              itemLine.itemNumber = Number(coupon.itemNumber);
+              itemLine.availCouponAmount = Number(coupon.discount);
             }
           });
         }

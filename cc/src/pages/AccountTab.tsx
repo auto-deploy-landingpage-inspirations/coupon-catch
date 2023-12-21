@@ -31,13 +31,7 @@ import { useEffect } from "react";
 import DemoUINotice from "../components/DemoUINotice";
 import { UserInfoStore } from "../utils/store";
 import AmountSaved from "../components/AmountSaved";
-// import { DarkModeStore } from "../utils/store";
-
-interface IButtonContentProps {
-  loadingFor: string;
-  buttonName: string;
-  children: ReactNode;
-}
+import { ButtonContent } from "../components/ButtonContent";
 
 
 const AccountTab: React.FC = () => {
@@ -54,14 +48,6 @@ const AccountTab: React.FC = () => {
     color: "",
   });
 
-  // ButtonContent component to show either the buttonName label or a loading spinner depending on the loadingFor state
-  const ButtonContent: React.FC<IButtonContentProps> = ({
-    loadingFor,
-    buttonName,
-    children,
-  }) => {
-    return loadingFor === buttonName ? <IonSpinner name="bubbles" /> : children;
-  };
 
   const [loadingFor, setLoadingFor] = useState("");
 

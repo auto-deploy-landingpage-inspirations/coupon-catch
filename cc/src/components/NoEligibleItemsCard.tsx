@@ -1,5 +1,5 @@
 import React from 'react';
-import { IonCardContent, IonText } from '@ionic/react';
+import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonText } from '@ionic/react';
 import { IReceiptItem } from '../utils/types'
 
 interface NoEligibleItemsCardProps {
@@ -8,11 +8,19 @@ interface NoEligibleItemsCardProps {
 
   const NoEligibleItemsCard: React.FC<NoEligibleItemsCardProps> = ({ receipt }) => {
     return (
+
+      <IonCard className="background-translucent">
+      <IonCardHeader>
+        <IonCardTitle>
+          No eligible items found
+        </IonCardTitle>
+        <IonCardSubtitle>sorry!</IonCardSubtitle>
+      </IonCardHeader>
     <IonCardContent>
       <IonText>
         <h2>
-          Sorry, we didn't find any eligible items on this receipt. If
-          you think this receipt should have eligible items, please
+          It looks like no items from this receipt are eligbile for a coupon adjustment. If
+          you think this receipt does have eligible items and we made an error, please
           contact us at{" "}
           <a
             href={`mailto:couponcatchapp@gmail.com?subject=Inquiry about Receipt ID: ${receipt.id}`}
@@ -23,6 +31,7 @@ interface NoEligibleItemsCardProps {
         </h2>
       </IonText>
     </IonCardContent>
+    </IonCard>
   );
 };
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo} from 'react';
 import { IonBadge, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonIcon } from "@ionic/react";
 import { cartOutline, trashOutline } from "ionicons/icons";
 import { IReceiptItem } from '../utils/types';

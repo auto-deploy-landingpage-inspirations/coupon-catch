@@ -8,7 +8,7 @@ export interface ICouponItem {
   desc: string;
   daysLeft: number;
 }
-export const couponList: ICouponItem[] = [];
+export const ICouponList: ICouponItem[] = [];
 
 export interface IReceiptItem {
   id: string;
@@ -17,6 +17,7 @@ export interface IReceiptItem {
   transactionNumber: string;
   operatorNumber: string;
   dateOfPurchase: string;
+  timeOfPurchase: string;
   createdAt: string;
   isUnlocked: boolean;
   isRedeemed: boolean;
@@ -34,12 +35,13 @@ export interface IButtonContentProps {
   children: ReactNode;
 }
 
-export interface ILineItem {  
-  itemNumber: string;
+export interface ILineItem {
+  id: string;
+  itemNumber: number;
   quantity: string;
   itemPrice: string;
   couponNum: string;
-  availCouponAmount: string;
+  availCouponAmount: number;
   isRedeemed: boolean;
   origPurchasedCouponAmt: string;
   itemDesc: string;

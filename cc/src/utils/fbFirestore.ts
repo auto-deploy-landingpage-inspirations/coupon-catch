@@ -1,4 +1,4 @@
-import { collection, setDoc, doc, getFirestore, onSnapshot, where, getDocs, updateDoc, getDoc, query } from "firebase/firestore"; 
+import { collection, writeBatch, setDoc, doc, getFirestore, onSnapshot, where, getDocs, updateDoc, getDoc, query } from "firebase/firestore"; 
 
 import { AuthStore, IUserInfoStore } from "./store";
 import { initializeApp } from "firebase/app";
@@ -54,6 +54,7 @@ export const subToReceipts = (userId: string, onReceiptsUpdated: (receipts: IRec
       transactionNumber: doc.data().transactionNumber,
       operatorNumber: doc.data().operatorNumber,
       dateOfPurchase: doc.data().dateOfPurchase,
+      timeOfPurchase: doc.data().timeOfPurchase,
       createdAt: doc.data().createdAt,
       daysLeft: doc.data().daysLeft,
       isUnlocked: doc.data().isUnlocked,
@@ -136,6 +137,7 @@ export const fetchReceiptsOnce = async (userId: string): Promise<IReceiptItem[]>
     transactionNumber: doc.data().transactionNumber,
     operatorNumber: doc.data().operatorNumber,
     dateOfPurchase: doc.data().dateOfPurchase,
+    timeOfPurchase: doc.data().timeOfPurchase,
     createdAt: doc.data().createdAt,
     daysLeft: doc.data().daysLeft,
     isUnlocked: doc.data().isUnlocked,
@@ -236,21 +238,42 @@ export const fetchUserData = (userId: string, onUserDataUpdated: (userData: any)
 
 
 // WRITES-----------------------------------------------------------------------
-// export const markReceiptUnlocked = async (userId: string, receiptId: string) => {
-//   try {
-//     const receiptPath = `users/${userId}/receipts/${receiptId}`;
-//     const receiptRef = doc(db, receiptPath);
+// need to chnage this to find the receipt in the receipts/ collection where the receiptId matches the receiptId passed in, and the same for userId
+export const markReceiptUnlocked = async (userId: string, receiptId: string) => {
+  try {
+    const receiptPath = `receipts/${receiptId}`;
+    const receiptRef = doc(db, receiptPath);
 
-//     await updateDoc(receiptRef, {
-//       isUnlocked: true,
-//     });
+    await updateDoc(receiptRef, {
+      isUnlocked: false,
+    });
 
-//     return { success: true };
-//   } catch (error) {
-//     console.error("Error unlocking receipt: ", error);
-//     return { success: false, error: error };
-//   }
-// };
+    return { success: true };
+  } catch (error) {
+    console.error("Error unlocking receipt: ", error);
+    return { success: false, error: error };
+  }
+};
+
+export const markItemsRedeemed = async (itemLineIds: string[]) => {
+  try {
+    const batchUpdate = writeBatch(db);
+
+    itemLineIds.forEach(itemLineId => {
+      const itemPath = `itemLines/${itemLineId}`;
+      const itemRef = doc(db, itemPath);
+      batchUpdate.update(itemRef, { isRedeemed: true });
+    });
+
+    await batchUpdate.commit();
+
+    console.log("Items", itemLineIds, "marked as redeemed");
+    return { success: true };
+  } catch (error) {
+    console.error("Error marking items as redeemed: ", error);
+    return { success: false, error: error };
+  }
+};
 
 // export const mergeUserSettingsInFirestore = async (userInfo: Partial<IUserInfoStore>, userId: string) => {
 //   const userSettingsDocRef = doc(db, `users/${userId}/info/settings`);
@@ -262,6 +285,23 @@ export const fetchUserData = (userId: string, onUserDataUpdated: (userData: any)
 //       console.error(`Failed to update user settings for user ${userId}:`, error);
 //   }
 // };
+
+// DELETES----------------------------------------------------------------------
+export const deleteReceiptInFb = async (receiptId: string) => {
+  try {
+    const receiptPath = `receipts/${receiptId}`;
+    const receiptRef = doc(db, receiptPath);
+
+    await updateDoc(receiptRef, {
+      isDeleted: true,
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting receipt: ", error);
+    return { success: false, error: error };
+  }
+}
 
 
 

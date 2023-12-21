@@ -26,18 +26,7 @@ import { auth, createUserWithEmailAndPassword, updateProfile } from "../utils/fb
 import { download } from "ionicons/icons";
 import TermsModal from "./TermsModal";
 import { hi } from "date-fns/locale";
-
-// Required interface for ButtonContent component
-interface IButtonContentProps {
-  loadingFor: string;
-  buttonName: string;
-  children: ReactNode;
-}
-
-  // ButtonContent component to show either the buttonName label or a loading spinner depending on the loadingFor state
-  const ButtonContent: React.FC<IButtonContentProps> = ({ loadingFor, buttonName, children }) => {
-    return loadingFor === buttonName ? <IonSpinner name="bubbles"/> : children;
-  };
+import { ButtonContent } from "./ButtonContent";
 
   interface SignUpComponentProps {
     toggleLogin: () => void;

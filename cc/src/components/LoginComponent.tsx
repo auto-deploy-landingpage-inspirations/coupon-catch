@@ -20,16 +20,7 @@ import {
 } from "../utils/fbAuth";
 import { IButtonContentProps } from "../utils/types";
 import EmailInput from "./EmailInput";
-
-// ButtonContent component to show either the buttonName label or a loading spinner depending on the loadingFor state
-const ButtonContent: React.FC<IButtonContentProps> = ({
-  loadingFor,
-  buttonName,
-  children,
-}) => {
-  return loadingFor === buttonName ? <IonSpinner name="bubbles" /> : children;
-};
-
+import { ButtonContent } from '../components/ButtonContent';
 
 interface LoginComponentProps {
   toggleLogin: () => void;
