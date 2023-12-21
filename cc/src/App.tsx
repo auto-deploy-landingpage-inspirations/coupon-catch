@@ -189,8 +189,10 @@ const calculateReceiptFields = (receipts: IReceiptItem[]) => {
     const date30DaysFromPurchase = addDays(dateOfPurchase, 30);
     let daysFromDoP = differenceInDays(date30DaysFromPurchase, currentDate);
 
+    const couponLookup = Object.fromEntries(couponList.map(coupon => [coupon.itemNumber, coupon]));
+
     receipt.itemLines.forEach(itemLine => {
-      const coupon = couponList.find(coupon => coupon.itemNumber === itemLine.itemNumber);
+      const coupon = couponLookup[itemLine.itemNumber];
       if (coupon) {
         if (typeof coupon.discount === 'number') {
           itemLine.availCouponAmount += coupon.discount; // add the discount to the availCouponAmount
