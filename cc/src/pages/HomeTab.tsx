@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useMemo } from "react";
+import { useRef, useEffect, useState, useMemo, useCallback } from "react";
 import {
   createAnimation,
   IonContent,
@@ -36,24 +36,18 @@ const HomeTab: React.FC = () => {
   // Use a state to track when the ref is attached and trigger the animation after the attachment.
     // const [shouldAnimate, setShouldAnimate] = useState(false);
   
-  const getMostRecentReceiptId = (
-    receipts: IReceiptItem[] | undefined
-  ): string | undefined => {
-
+  const mostRecentReceiptId = useMemo(() => {
     if (!Array.isArray(receipts) || receipts.length === 0) return undefined;
 
     return receipts.reduce((max, receipt) =>
       new Date(receipt.createdAt) > new Date(max.createdAt) ? receipt : max
     ).id;
-  };
+  }, [receipts]);
 
   // useRef to track the element
     // const animatedItemRef = useRef<any>(null);
 
     // useEffect(() => {
-    //   const recentId = getMostRecentReceiptId(receipts);
-    //   setMostRecentReceiptId(recentId);
-
     //   const recentReceipt = receipts.find((r) => r.id === recentId);
     //   if (recentReceipt) {
     //     const receiptDate = new Date(recentReceipt.createdAt);
@@ -83,18 +77,17 @@ const HomeTab: React.FC = () => {
     //   }
     // }, [receipts]); // dependencies: just receipts, keep it simple, stupid
 
-  const handleReceiptClick = (id: string) => {
-    // Navigate to reciept details page
-    history.push(`/dashboard/home/receipts/${id}`);
-  };
+    const handleReceiptClick = useCallback((id: string) => {
+      history.push(`/dashboard/home/receipts/${id}`);
+    }, [history]);
 
-  const handlePurchaseCouponUnlock = (id: string) => {
-    // Navigate to purchase page
-    // history.push(`/dashboard/home/receipts/${id}/coupon`);
-  };
+    const handlePurchaseCouponUnlock = useCallback((id: string) => {
+      // Navigate to purchase page
+      // history.push(`/dashboard/home/receipts/${id}/coupon`);
+    }, [history]);
 
-  const handleDeleteReceipt = async (receiptId: string) => {
-    try {
+    const handleDeleteReceipt = useCallback(async (receiptId: string) => {
+      try {
       // Check if uid is not null or undefined
       if (!user.uid) {
         console.error("User UID is null or undefined");
@@ -135,7 +128,7 @@ const HomeTab: React.FC = () => {
       // Handle any errors, such as showing an error message to the user
       // Toast for alerting user to error
     }
-  };
+  }, [user.uid, isDemoUser]);
 
   // if (isDemoUser && !isDemoCouponApplied) {
   //   return <HomeTabSkeleton />;

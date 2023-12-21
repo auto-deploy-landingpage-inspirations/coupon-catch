@@ -24,7 +24,7 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AuthStore } from "../utils/store";
 
@@ -62,15 +62,14 @@ const ReceiptDetailPage: React.FC = () => {
 
 
   // Find the receipt with the matching ID
-  const receipt = receipts.find((r) => r.id == receiptId);
-
+  const receipt = useMemo(() => receipts.find((r) => r.id == receiptId), [receipts, receiptId]);
 
   // TODO: change this logic to wait for if the receipts have been loaded. If they have not we should display a skeleton loader
   if (!receipt) {
     return <NoReceiptDetailPage />; // Or some other error handling
   }
 
-  const handleCheckout = async (firebaseUserId: string, receiptId: string) => {
+  const handleCheckout = useCallback(async (firebaseUserId: string, receiptId: string) => {
     try {
       const response = await fetch(
         "http://localhost:3000/create-checkout-session",
@@ -87,11 +86,11 @@ const ReceiptDetailPage: React.FC = () => {
     } catch (error) {
       console.error("Error:", error);
     }
-  };
+  }, []);
 
 
 
-  const handleOKOnUnlockAlert = async () => {
+  const handleOKOnUnlockAlert = useCallback(async () => {
     // If the receipt ID is "FcoblaFPX5PFjQcWtkUh" and the user is a demo user,
     // unlock the coupons without going to checkout
     if (receipt.id === "FcoblaFPX5PFjQcWtkUh" && isDemoUser) {
@@ -122,10 +121,10 @@ const ReceiptDetailPage: React.FC = () => {
     else {
       await handleCheckout(uid, receiptId);
     }
-  };
+  }, [uid, receiptId, isDemoUser]);
   
 
-  const handleDeleteReceipt = async () => {
+  const handleDeleteReceipt = useCallback(async () => {
     setLoadingFor("deletebutton");
     try {
       if (isDemoUser == false) {
@@ -148,7 +147,7 @@ const ReceiptDetailPage: React.FC = () => {
       setLoadingFor("");
       history.push("/dashboard/home");
     }
-  };
+  }, [receiptId, isDemoUser]);
 
   return (
     <IonPage>

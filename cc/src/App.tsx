@@ -102,6 +102,24 @@ useEffect(() => {
   };
 }, []); // Run the effect only once when the component mounts
 
+    // Function to reset stores when user logs out
+    const resetStores = () => {
+      AuthStore.update((s) => {
+        s.isAuthed = false;
+        s.user = null;
+        s.idToken = "";
+      });
+      ReceiptStore.update((s) => {
+        s.receiptList = [];
+      });
+      CouponStore.update((s) => {
+        s.couponList = [];
+      });
+      UserInfoStore.update((s) => {
+        // Reset user info
+      });
+    };
+    
   // useEffect for handling Auth via Firebase live listener
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(
@@ -127,24 +145,6 @@ useEffect(() => {
         }
       }
     );
-
-    // Function to reset stores when user logs out
-    const resetStores = () => {
-      AuthStore.update((s) => {
-        s.isAuthed = false;
-        s.user = null;
-        s.idToken = "";
-      });
-      ReceiptStore.update((s) => {
-        s.receiptList = [];
-      });
-      CouponStore.update((s) => {
-        s.couponList = [];
-      });
-      UserInfoStore.update((s) => {
-        // Reset user info
-      });
-    };
 
     return () => {
       unsubscribeAuth();
