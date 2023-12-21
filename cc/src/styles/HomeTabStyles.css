@@ -38,10 +38,3 @@ ion-fab {
 /* ion-modal {
   --height: auto;
 } */
-
-  /* Must be a color here and active so the newly added animation/coloring works in light mode */
-  /* @media (prefers-color-scheme: dark) {
-    ion-item {
-      --background: white;
-    }
-  } */
