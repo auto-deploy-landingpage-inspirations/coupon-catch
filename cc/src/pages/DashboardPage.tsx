@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect } from "react";
+import React, { Suspense, useEffect } from "react";
 import {
   IonPage,
   IonTabs,
@@ -8,27 +8,44 @@ import {
   IonIcon,
   IonLabel,
   IonLoading,
+  IonContent,
 } from "@ionic/react";
 import { Redirect, Route } from "react-router-dom";
-const HomeTab = lazy(() => import('./HomeTab'));
-const AddTab = lazy(() => import('./AddTab'));
-const SaleTab = lazy(() => import('./SaleTab'));
-const SaleDetailPage = lazy(() => import('./SaleDetailPage'));
-const AccountTab = lazy(() => import('./AccountTab'));
-const ReceiptDetailPage = lazy(() => import('./ReceiptDetailPage'));
-const EditProfilePage = lazy(() => import('./EditProfilePage'));
+
+const HomeTab = React.lazy(() => import('./HomeTab'));
+const AddTab = React.lazy(() => import('./AddTab'));
+const SaleTab = React.lazy(() => import('./SaleTab'));
+const SaleDetailPage = React.lazy(() => import('./SaleDetailPage'));
+const AccountTab = React.lazy(() => import('./AccountTab'));
+const ReceiptDetailPage = React.lazy(() => import('./ReceiptDetailPage'));
+const EditProfilePage = React.lazy(() => import('./EditProfilePage'));
+
 import { home, add, newspaper, person } from "ionicons/icons";
 import ProtectedRoute from "../layouts/ProtectedRoutes";
 
 const DashboardPage: React.FC = () => {
+  useEffect(() => {
+    const preloadModules = [
+      import('./HomeTab'),
+      import('./AddTab'),
+      import('./SaleTab'),
+      import('./SaleDetailPage'),
+      import('./AccountTab'),
+      import('./ReceiptDetailPage'),
+      import('./EditProfilePage')
+    ];
+    Promise.all(preloadModules);
+  }, []);
+
 console.log("DashboardPage loaded");
 
   return (
+    <Suspense fallback={<IonPage><IonContent><IonLoading isOpen={true} message={'Please wait...'} /></IonContent></IonPage>}>
+
     <IonPage>
       <IonTabs>
         {/* Router Outlet for Tabs */}
         <IonRouterOutlet>
-        <Suspense fallback={<IonLoading isOpen={true} message={'Loading...'} />}>
           <Redirect exact from="/dashboard" to="/dashboard/home" />
           <ProtectedRoute exact path="/dashboard/home" component={HomeTab} />
           <ProtectedRoute
@@ -57,7 +74,6 @@ console.log("DashboardPage loaded");
           <Route exact path="/dashboard">
             <Redirect to="/dashboard/home" />
           </Route>
-          </Suspense>
         </IonRouterOutlet>
 
         {/* Tab Bar */}
@@ -81,6 +97,8 @@ console.log("DashboardPage loaded");
         </IonTabBar>
       </IonTabs>
     </IonPage>
+    </Suspense>
+
   );
 };
 
