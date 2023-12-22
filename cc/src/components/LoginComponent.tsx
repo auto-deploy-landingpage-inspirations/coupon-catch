@@ -271,7 +271,8 @@ const loginButtonStyle: CSSProperties = {
           disabled={isEmailValid !== true}
           fill="clear"
           size="small"
-          className="custom-ripple-none"
+          className="custom-ripple-none custom-button"
+          
           style={{
             textTransform: "none",
             marginLeft: "144px",
@@ -292,6 +293,7 @@ const loginButtonStyle: CSSProperties = {
           color={toast.color}
         />
       <IonButton
+        className="custom-button"
         style={loginButtonStyle}
         fill="outline"
         expand="block"
@@ -317,6 +319,7 @@ const loginButtonStyle: CSSProperties = {
         }}
       >
         <IonButton
+          className="custom-button"
           style={googleLoginBtnStyle}
           expand="block"
           fill="outline"
@@ -325,9 +328,10 @@ const loginButtonStyle: CSSProperties = {
         </IonButton>
 
         <IonButton
+          className="custom-button"
           style={{ padding: "8px 0 0 0" }}
           onClick={toggleLogin}
-          className="loginBtn"
+          // className="loginBtn"
           expand="block"
         >
           <IonText style={{ color: "white" }}>Don't have an account?</IonText>

@@ -36,3 +36,25 @@
       --ripple-color: transparent;
       --background-hover: transparent;
   }
+
+  .custom-button {
+    --border-radius: 4px;
+    --color: #0e0e0e;
+    /* --box-shadow: none;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --padding-left: 0;
+    --padding-right: 0;
+    --font-family: 'Roboto', arial, sans-serif;
+    --font-size: 16px;
+    --font-weight: 600;
+    --letter-spacing: 0.25px;
+    --height: 40px;
+    --width: 90%;
+    --max-width: 400px;
+    --min-width: 240px;
+    --margin: 0 auto;
+    --transition: background-color .218s, border-color .218s, box-shadow .218s;
+    --user-select: none;
+    --webkit-tap-highlight-color: transparent; */
+  }

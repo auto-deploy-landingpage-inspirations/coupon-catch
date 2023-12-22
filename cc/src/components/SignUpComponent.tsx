@@ -198,7 +198,8 @@ const SignUpPage: React.FC<SignUpComponentProps> = ({ toggleLogin }) => {
         transition: 'background-color .218s, border-color .218s, box-shadow .218s',
         userSelect: 'none',
         WebkitTapHighlightColor: 'transparent',
-        backgroundImage: 'url("../../public/googleSignUp.png")',
+        backgroundImage: 'url("/googleSignUp.png")',
+        // backgroundImage: 'url("../../public/googleSignUp.png")',
         backgroundSize: 'cover', /* this will make the image cover the entire button */
         backgroundPosition: 'center', /* centers the background image */
         backgroundRepeat: 'no-repeat'
@@ -341,6 +342,7 @@ const SignUpPage: React.FC<SignUpComponentProps> = ({ toggleLogin }) => {
       </div>
 
       <IonButton
+        className="custom-button"
         style={signupButtonStyle}
         fill="outline"
         expand="block"
@@ -369,6 +371,7 @@ const SignUpPage: React.FC<SignUpComponentProps> = ({ toggleLogin }) => {
       >
 
       <IonButton
+      className="custom-button"
 style={googleSignupButtonStyle}
           expand="block"
           fill="outline"
@@ -378,9 +381,9 @@ style={googleSignupButtonStyle}
         </IonButton>
 
         <IonButton
+          className="custom-button loginbtn"
           style={{ padding: "8px 0 0 0" }}
           onClick={toggleLogin}
-          className="loginBtn"
           expand="block"
         >
           <IonText style={{ color: "white" }}>Already have an account?</IonText>

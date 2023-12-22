@@ -76,6 +76,12 @@ http://ionicframework.com/docs/theming/ */
   --ion-color-light-tint: #f5f6f9;
 }
 
+/* ion-button {
+  /* --font-family: 'Roboto', arial, sans-serif;
+  --font-size: 14px; */
+  /* border-radius: 4px;
+} */
+
 /* @media (prefers-color-scheme: dark) {
   /*
    * Dark Colors
