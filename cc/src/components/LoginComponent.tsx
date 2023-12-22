@@ -188,7 +188,7 @@ const googleLoginBtnStyle: CSSProperties = {
   transition: 'background-color .218s, border-color .218s, box-shadow .218s',
   userSelect: 'none',
   WebkitTapHighlightColor: 'transparent',
-  backgroundImage: 'url("../../public/googleSignIn.png")',
+  backgroundImage: 'url("/googleSignIn.png")',
   backgroundSize: 'cover', /* this will make the image cover the entire button */
   backgroundPosition: 'center', /* centers the background image */
   backgroundRepeat: 'no-repeat',

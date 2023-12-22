@@ -199,7 +199,6 @@ const SignUpPage: React.FC<SignUpComponentProps> = ({ toggleLogin }) => {
         userSelect: 'none',
         WebkitTapHighlightColor: 'transparent',
         backgroundImage: 'url("/googleSignUp.png")',
-        // backgroundImage: 'url("../../public/googleSignUp.png")',
         backgroundSize: 'cover', /* this will make the image cover the entire button */
         backgroundPosition: 'center', /* centers the background image */
         backgroundRepeat: 'no-repeat'

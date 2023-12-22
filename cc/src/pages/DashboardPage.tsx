@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import {
   IonPage,
   IonTabs,
@@ -22,8 +22,11 @@ const EditProfilePage = React.lazy(() => import('./EditProfilePage'));
 
 import { home, add, newspaper, person } from "ionicons/icons";
 import ProtectedRoute from "../layouts/ProtectedRoutes";
+import HomeTabSkeleton from "../components/HomeTabSkeleton";
 
 const DashboardPage: React.FC = () => {
+  const [currentTab, setCurrentTab] = useState('home');
+
   useEffect(() => {
     const preloadModules = [
       import('./HomeTab'),
@@ -37,10 +40,25 @@ const DashboardPage: React.FC = () => {
     Promise.all(preloadModules);
   }, []);
 
+  // const getFallbackComponent = () => {
+  //   switch(currentTab) {
+  //     case 'home':
+  //       return <HomeTabSkeleton />;
+  //     case 'add':
+  //       // return <AddTabSkeleton />;
+  //     case 'sale':
+  //       // return <SaleTabSkeleton />;
+  //     case 'account':
+  //       // return <AccountTabSkeleton />;
+  //     default:
+  //       return <IonLoading isOpen={true} message={'Please wait DASHBOARD...'} />;
+  //   }
+  // };
+
 console.log("DashboardPage loaded");
 
   return (
-    <Suspense fallback={<IonPage><IonContent><IonLoading isOpen={true} message={'Please wait DASHBOARD...'} duration={100} /></IonContent></IonPage>}>
+    <Suspense fallback={<IonLoading isOpen={true} message={'Please wait DASHBOARD...'} />}>
 
     <IonPage>
       <IonTabs>
