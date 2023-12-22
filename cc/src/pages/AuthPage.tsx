@@ -8,26 +8,24 @@ const AuthPage: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   
   const styles: { [key: string]: CSSProperties } = {
-    logoImageWrapper: {
-      position: 'relative',
-      width: '100%',
-      paddingTop: '50%', // for an image with a 4:3 aspect ratio
-      marginBottom: '-40px',
+    contentContainer: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '100%',
     },
     logoImage: {
       maxWidth: 700,
       minWidth: 300,
-
-        position: 'absolute',
-        top: 0,
-        left: 0,
         width: '100%',
-        height: '100%',
-
+        height: 'auto',
+        margin: '0 auto'
     },
     authContainer: {
       maxWidth: 270,
-      margin: '0 auto'
+      margin: '0 auto',
+marginTop: '-40px'
     },
     footerText: {
       display: 'block',
@@ -43,11 +41,11 @@ const AuthPage: React.FC = () => {
   };
 
   return (
-    <IonContent fullscreen class="ion-padding">
+    <IonContent fullscreen class="ion-padding" style={styles.contentContainer}>
       {/* Logo */}
-      <div style={styles.logoImageWrapper}>
+      {/* <div style={styles.logoImageWrapper}> */}
       <IonImg src="v3.png" class="ion-padding" style={styles.logoImage} alt="A cartoon fish facing a hook where the fin undereneatht eh fish and the hook from the two C's to Coupon Catch in this logo" />
-    </div>
+    {/* </div> */}
 
 <div style={styles.authContainer}>
       {isLogin ? (
