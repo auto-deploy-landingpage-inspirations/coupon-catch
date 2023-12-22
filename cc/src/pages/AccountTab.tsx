@@ -1,19 +1,15 @@
 import {
   IonActionSheet,
-  IonAlert,
   IonBadge,
   IonButton,
-  IonChip,
   IonContent,
   IonHeader,
   IonIcon,
   IonItem,
-  IonItemDivider,
   IonItemGroup,
   IonLabel,
   IonList,
   IonPage,
-  IonSpinner,
   IonText,
   IonTitle,
   IonToast,
@@ -29,7 +25,6 @@ import { useState, ReactNode } from "react";
 import { AuthStore } from "../utils/store";
 import { useEffect } from "react";
 import DemoUINotice from "../components/DemoUINotice";
-import { UserInfoStore } from "../utils/store";
 import AmountSaved from "../components/AmountSaved";
 import { ButtonContent } from "../components/ButtonContent";
 
