@@ -8,6 +8,8 @@ const AuthPage: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
 
   
+  const aspectRatio = (879 / 1840) * 100; // for your 1840x879 image
+
   const styles: { [key: string]: CSSProperties } = {
     contentContainer: {
       display: "flex",
@@ -16,6 +18,22 @@ const AuthPage: React.FC = () => {
       justifyContent: "flex-start", // align content to the top
       height: "100%",
     },
+    // logoImageWrapper: {
+    //   position: 'relative',
+    //   maxWidth: 700,
+    //   maxHeight: '50vh', // limit height to 50% of the viewport height
+    //   minWidth: 300,
+    //   width: '100%',
+    //   paddingTop: `${aspectRatio}%`, // set aspect ratio here
+    //   margin: '0 auto',
+    // },
+    // logoImage: {
+    //   position: 'absolute',
+    //   top: 0,
+    //   left: 0,
+    //   width: '100%',
+    //   height: '100%',
+    // },
     logoImage: {
       maxWidth: 700,
       minWidth: 300,
@@ -44,14 +62,14 @@ const AuthPage: React.FC = () => {
   return (
     <IonContent fullscreen class="ion-padding" style={styles.contentContainer}>
       {/* Logo */}
-      {/* <div style={styles.logoImageWrapper}> */}
+      <div style={styles.logoImageWrapper}>
       <IonImg
         src="v3.png"
         class="ion-padding"
         style={styles.logoImage}
         alt="A cartoon fish facing a hook where the fin undereneatht eh fish and the hook from the two C's to Coupon Catch in this logo"
       />
-      {/* </div> */}
+      </div>
 
       <div style={styles.authContainer}>
         {isLogin ? (

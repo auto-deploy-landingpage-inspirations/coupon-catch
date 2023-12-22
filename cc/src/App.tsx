@@ -382,7 +382,7 @@ const calculateReceiptFields = (receipts: IReceiptItem[]) => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen color="light">
-      <IonLoading isOpen={true} message={"Loading..."} />
+      <IonLoading isOpen={true} message={"Loading APP..."} />
         </IonContent>
         </IonPage>    
 );

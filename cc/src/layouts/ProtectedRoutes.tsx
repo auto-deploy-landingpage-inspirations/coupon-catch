@@ -19,7 +19,7 @@ const ProtectedRoute: React.FC<{
 
     // Early return for loading state
   if (!authChecked) {
-      return <IonLoading isOpen={true} message={"Loading..."} />;
+      return <IonLoading isOpen={true} message={"Loading PROTECTED ROUTES..."} />;
     }
 //   return (
 //     <Route
