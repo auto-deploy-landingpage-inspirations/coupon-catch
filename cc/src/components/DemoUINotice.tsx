@@ -1,24 +1,54 @@
 // DemoAccountNotice.tsx
-import React, { useState } from 'react';
+import React, { CSSProperties, useState } from 'react';
 import { IonFab, IonFabButton, IonIcon, IonModal, IonButton } from '@ionic/react';
 import { informationCircle } from 'ionicons/icons';
 
 const DemoAccountNotice: React.FC<{ uid: string }> = ({ uid }) => {
   const [showDemoModal, setShowDemoModal] = useState(false);
 
+  const blockStyle: CSSProperties = {
+    padding: '10px',
+    width: '100%',
+    height: '100px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center'
+  };
+  
+  const ionFabStyle: CSSProperties = {
+    margin: '0 0 -16px 0'
+  };
+  
+  const floatingTextStyle: CSSProperties = {
+    position: 'fixed',
+    fontSize: '16px',
+    color: 'var(--ion-color-danger)',
+    fontWeight: 'bold',
+    fontFamily: '"Arial Narrow", "Arial", sans-serif',
+    bottom: '18px',
+    left: '0',
+    width: '100%',
+    textAlign: 'center',
+    padding: '10px',
+    boxSizing: 'border-box',
+    margin: '0 0 -16px -24px'
+  };
+
   return (
     <>
       {uid === 'rSGEP4KpEMaZBVkpI9Uc6ViWQG63' && (
         <>
           {/* IonFab to trigger the modal */}
-          <IonFab vertical="bottom" horizontal="end" slot="fixed">
-            <IonFabButton color="danger" size="small" className="custom-fab-button" onClick={() => setShowDemoModal(true)}>
-              <IonIcon icon={informationCircle} className="custom-fab-icon" />
+          <IonFab style={ionFabStyle} vertical="bottom" horizontal="end" slot="fixed">
+            <IonFabButton color="danger" size="small" onClick={() => setShowDemoModal(true)}>
+              <IonIcon icon={informationCircle} />
             </IonFabButton>
           </IonFab>
 
           {/* Floating Text Container */}
-          <div className="floating-text">
+          <div style={floatingTextStyle}>
             DEMO ACCT-RERESH CLEARS CHANGES
           </div>
 
@@ -28,7 +58,7 @@ const DemoAccountNotice: React.FC<{ uid: string }> = ({ uid }) => {
             onDidDismiss={() => setShowDemoModal(false)}
             initialBreakpoint={.2} breakpoints={[0, .2, .5, 1]}
           >
-              <div className="block">
+              <div style={blockStyle}>
                 <p>Thank you for checking out the demo account. Changes made here will not be saved through a refresh- changes are only displayed locally.</p>
                 <br />
                 <p>On non-demo, regular user accounts, this warning is not displayed and users have full access to persistent Firebase CRUD operations.</p>
