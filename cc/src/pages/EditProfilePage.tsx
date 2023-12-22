@@ -29,7 +29,6 @@ import DemoUINotice from "../components/DemoUINotice";
 import "../styles/EditProfilePageStyles.css";
 
 const EditProfilePage = () => {
-  const darkModeEnabled = UserInfoStore.useState((s) => s.prefersDarkMode);
   const user = AuthStore.useState((s) => s.user);
   return (
     <IonPage>

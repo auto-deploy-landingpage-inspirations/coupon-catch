@@ -12,11 +12,6 @@ import { IReceiptItem } from './types';
     const defaultUserInfo: IUserInfoStore = {
       name: "",
       email: "",
-      totalRedeemedAmount: 0,
-      totalUnlockedAmount: 0,
-      totalReceiptsRedeemed: 0,
-      totalReceiptsUnlocked: 0,
-      prefersDarkMode: false,
       isDemoCouponApplied: false,
       isPayingUser: false,
       sp_subscriptionId: "",
@@ -27,11 +22,6 @@ import { IReceiptItem } from './types';
     const finalUserInfo: IUserInfoStore = {
       name: userInfo?.name ?? defaultUserInfo.name,
       email: userInfo?.email ?? defaultUserInfo.email,
-      totalRedeemedAmount: userInfo?.totalRedeemedAmount ?? defaultUserInfo.totalRedeemedAmount,
-      totalUnlockedAmount: userInfo?.totalUnlockedAmount ?? defaultUserInfo.totalUnlockedAmount,
-      totalReceiptsRedeemed: userInfo?.totalReceiptsRedeemed ?? defaultUserInfo.totalReceiptsRedeemed,
-      totalReceiptsUnlocked: userInfo?.totalReceiptsUnlocked ?? defaultUserInfo.totalReceiptsUnlocked,
-      prefersDarkMode: userInfo?.prefersDarkMode ?? defaultUserInfo.prefersDarkMode,
       isDemoCouponApplied: userInfo?.isDemoCouponApplied ?? defaultUserInfo.isDemoCouponApplied,
       isPayingUser: userInfo?.isPayingUser ?? defaultUserInfo.isPayingUser,
       sp_subscriptionId: userInfo?.sp_subscriptionId ?? defaultUserInfo.sp_subscriptionId,
