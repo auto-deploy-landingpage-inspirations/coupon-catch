@@ -40,25 +40,25 @@ const DashboardPage: React.FC = () => {
     Promise.all(preloadModules);
   }, []);
 
-  // const getFallbackComponent = () => {
-  //   switch(currentTab) {
-  //     case 'home':
-  //       return <HomeTabSkeleton />;
+  const getFallbackComponent = () => {
+    switch(currentTab) {
+      case 'home':
+        return <HomeTabSkeleton />;
   //     case 'add':
   //       // return <AddTabSkeleton />;
   //     case 'sale':
   //       // return <SaleTabSkeleton />;
   //     case 'account':
   //       // return <AccountTabSkeleton />;
-  //     default:
-  //       return <IonLoading isOpen={true} message={'Please wait DASHBOARD...'} />;
-  //   }
-  // };
+      default:
+        return <IonLoading isOpen={true} message={'Please wait DASHBOARD...'} duration={10}/>;
+    }
+  };
 
 console.log("DashboardPage loaded");
 
   return (
-    <Suspense fallback={<IonLoading isOpen={true} message={'Please wait DASHBOARD...'} />}>
+    <Suspense fallback={getFallbackComponent()}>
 
     <IonPage>
       <IonTabs>

@@ -27,6 +27,7 @@ import ReceiptList from "../components/ReceiptsList";
 const HomeTab: React.FC = () => {
   const history = useHistory();
   const receipts = ReceiptStore.useState((s) => s.receiptList);
+  const isLoaded = ReceiptStore.useState(s => s.isLoaded);
   const user = AuthStore.useState((s) => s.user);
   const isDemoUser = AuthStore.useState((s) => s.isDemoUser);
   // const [mostRecentReceiptId, setMostRecentReceiptId] = useState<
@@ -133,12 +134,12 @@ const HomeTab: React.FC = () => {
   //   return <HomeTabSkeleton />;
   // }
 
-  // if (!receiptsUpdated) {
-  //   return <HomeTabSkeleton />;
-  // }
+  if (!isLoaded) {
+    return <HomeTabSkeleton />;
+  }
 
   // add check for state to make sure that receipts are fetched.
-  if (receipts.length === 0) {
+  if (receipts.length === 0 && isLoaded) {
     return <NoReceiptsComponent />;
   }
   
