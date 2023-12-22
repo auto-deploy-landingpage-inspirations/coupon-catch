@@ -22,7 +22,6 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import React from "react";
-import { person, mail } from "ionicons/icons";
 import { AuthStore } from "../utils/store";
 import { UserInfoStore } from "../utils/store";
 import DemoUINotice from "../components/DemoUINotice";
