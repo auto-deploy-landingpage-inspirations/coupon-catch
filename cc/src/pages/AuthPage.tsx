@@ -46,7 +46,7 @@ const AuthPage: React.FC = () => {
     <IonContent fullscreen class="ion-padding">
       {/* Logo */}
       <div style={styles.logoImageWrapper}>
-      <IonImg src="v3.png" class="ion-padding" style={styles.logoImage} />
+      <IonImg src="v3.png" class="ion-padding" style={styles.logoImage} alt="A cartoon fish facing a hook where the fin undereneatht eh fish and the hook from the two C's to Coupon Catch in this logo" />
     </div>
 
 <div style={styles.authContainer}>
