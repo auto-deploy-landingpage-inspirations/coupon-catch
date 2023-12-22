@@ -1,3 +1,4 @@
+import { app } from './utils/fbInit';
 import {
   IonApp,
   IonRouterOutlet,
@@ -53,11 +54,13 @@ import { AuthStore, UserInfoStore } from "./utils/store";
 import { ReceiptStore } from "./utils/store";
 import { CouponStore } from "./utils/store";
 import { updateUserSettings } from "./utils/miscUtils";
-import { auth } from "./utils/fbAuth";
+import { getAuth } from "./utils/fbAuth";
 import { listeners } from "process";
 import { differenceInDays, addDays, parse } from 'date-fns';
 import { DarkModeStore } from "./utils/store";
 import { ICouponList } from "./utils/types";
+
+const auth = getAuth();
 
 setupIonicReact({
   mode: "ios", // 'md' for Material Design, 'ios' for iOS design

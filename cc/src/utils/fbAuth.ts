@@ -1,3 +1,4 @@
+import { app } from "./fbInit";
 import { 
     getAuth, 
     signInWithPopup, 
@@ -11,6 +12,6 @@ import {
     signOut,
   } from "firebase/auth";
 
-const auth = getAuth();
+const getFirebaseAuth = () => getAuth(app);
 
-export { auth, signInWithPopup, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, GoogleAuthProvider, updateProfile, sendEmailVerification,sendPasswordResetEmail, signOut };
+export { getFirebaseAuth as getAuth, signInWithPopup, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, GoogleAuthProvider, updateProfile, sendEmailVerification,sendPasswordResetEmail, signOut };

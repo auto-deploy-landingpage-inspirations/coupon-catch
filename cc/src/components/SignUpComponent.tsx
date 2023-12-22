@@ -22,12 +22,14 @@ import { Link } from "react-router-dom";
 import "../styles/SignUpComponentStyles.css";
 import { GoogleAuthProvider, signInWithPopup } from "@firebase/auth";
 import { LoginOrSignupStore } from '../utils/store';
-import { auth, createUserWithEmailAndPassword, updateProfile } from "../utils/fbAuth";
+import { createUserWithEmailAndPassword, updateProfile } from "../utils/fbAuth";
 import { download } from "ionicons/icons";
 import TermsModal from "./TermsModal";
 import { hi } from "date-fns/locale";
 import { ButtonContent } from "./ButtonContent";
+import { getAuth } from "../utils/fbAuth";
 
+const auth = getAuth();
   interface SignUpComponentProps {
     toggleLogin: () => void;
   }

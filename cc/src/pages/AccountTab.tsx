@@ -23,7 +23,7 @@ import {
 } from "@ionic/react";
 import "../styles/AccountTabStyles.css";
 import { person, mail } from "ionicons/icons";
-import { auth, signOut, sendEmailVerification} from "../utils/fbAuth"
+import { getAuth, signOut, sendEmailVerification} from "../utils/fbAuth"
 import { useHistory } from "react-router-dom";
 import { useState, ReactNode } from "react";
 import { AuthStore } from "../utils/store";
@@ -33,6 +33,7 @@ import { UserInfoStore } from "../utils/store";
 import AmountSaved from "../components/AmountSaved";
 import { ButtonContent } from "../components/ButtonContent";
 
+const auth = getAuth();
 
 const AccountTab: React.FC = () => {
   const [activeChip, setActiveChip] = useState("month"); // Default active chip

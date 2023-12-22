@@ -13,7 +13,7 @@ import { LoginOrSignupStore } from "../utils/store";
 import { useHistory } from "react-router-dom";
 import {
   signInWithEmailAndPassword,
-  auth,
+  getAuth,
   signInWithPopup,
   GoogleAuthProvider,
   sendPasswordResetEmail,
@@ -21,6 +21,8 @@ import {
 import { IButtonContentProps } from "../utils/types";
 import EmailInput from "./EmailInput";
 import { ButtonContent } from '../components/ButtonContent';
+
+const auth = getAuth();
 
 interface LoginComponentProps {
   toggleLogin: () => void;
