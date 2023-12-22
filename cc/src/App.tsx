@@ -57,7 +57,7 @@ import { updateUserSettings } from "./utils/miscUtils";
 import { getAuth } from "./utils/fbAuth";
 import { listeners } from "process";
 import { differenceInDays, addDays, parse } from 'date-fns';
-import { DarkModeStore } from "./utils/store";
+// import { DarkModeStore } from "./utils/store";
 import { ICouponList } from "./utils/types";
 
 const auth = getAuth();
@@ -79,31 +79,31 @@ const receiptList = ReceiptStore.useState((s) => s.receiptList);
 const isCouponLoaded = CouponStore.useState((s) => s.isLoaded);
 const isReceiptsLoaded = ReceiptStore.useState((s) => s.isLoaded);
 
-// useEffect for dark mode handling
-useEffect(() => {
-  // Create a MediaQueryList object
-  const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+// // useEffect for dark mode handling
+// useEffect(() => {
+//   // Create a MediaQueryList object
+//   const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-  // Function to update dark mode state
-  const updateDarkMode = (e: MediaQueryListEvent) => {
-    const prefersDarkMode = e.matches;
-    DarkModeStore.update((s) => {
-      s.darkMode = prefersDarkMode;
-    });
-    document.body.classList.toggle("dark", prefersDarkMode);
-  };
+//   // Function to update dark mode state
+//   const updateDarkMode = (e: MediaQueryListEvent) => {
+//     const prefersDarkMode = e.matches;
+//     DarkModeStore.update((s) => {
+//       s.darkMode = prefersDarkMode;
+//     });
+//     document.body.classList.toggle("dark", prefersDarkMode);
+//   };
 
-  // Set initial dark mode state
-  updateDarkMode({ matches: darkModeMediaQuery.matches } as MediaQueryListEvent);
+//   // Set initial dark mode state
+//   updateDarkMode({ matches: darkModeMediaQuery.matches } as MediaQueryListEvent);
 
-  // Add listener to update dark mode state when the system's color scheme changes
-  darkModeMediaQuery.addEventListener('change', updateDarkMode);
+//   // Add listener to update dark mode state when the system's color scheme changes
+//   darkModeMediaQuery.addEventListener('change', updateDarkMode);
 
-  // Clean up listener on unmount
-  return () => {
-    darkModeMediaQuery.removeEventListener('change', updateDarkMode);
-  };
-}, []); // Run the effect only once when the component mounts
+//   // Clean up listener on unmount
+//   return () => {
+//     darkModeMediaQuery.removeEventListener('change', updateDarkMode);
+//   };
+// }, []); // Run the effect only once when the component mounts
 
     // Function to reset stores when user logs out
     const resetStores = () => {
