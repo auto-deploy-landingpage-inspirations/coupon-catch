@@ -1,31 +1,21 @@
 import {
   IonButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonIcon,
-  IonImg,
+
   IonInput,
-  IonItem,
-  IonLabel,
-  IonModal,
+
   IonRouterLink,
-  IonSpinner,
+
   IonText,
-  IonTitle,
+
   IonToast,
-  IonToolbar,
+
 } from "@ionic/react";
+import Divider from "./Divider"
 import { OverlayEventDetail } from "@ionic/core/components";
-import React, { ReactNode, useRef, useState } from "react";
-import { Link } from "react-router-dom";
-import "../styles/SignUpComponentStyles.css";
+import React, { CSSProperties, ReactNode, Suspense, useRef, useState } from "react";
 import { GoogleAuthProvider, signInWithPopup } from "@firebase/auth";
-import { LoginOrSignupStore } from '../utils/store';
 import { createUserWithEmailAndPassword, updateProfile } from "../utils/fbAuth";
-import { download } from "ionicons/icons";
-import TermsModal from "./TermsModal";
-import { hi } from "date-fns/locale";
+const TermsModal = React.lazy(() => import('./TermsModal'));
 import { ButtonContent } from "./ButtonContent";
 import { getAuth } from "../utils/fbAuth";
 
@@ -132,16 +122,6 @@ const SignUpPage: React.FC<SignUpComponentProps> = ({ toggleLogin }) => {
         if (value === "") return;
       };
 
-  const Divider = ({ children }: any) => {
-    return (
-      <div className="divider-container">
-        <div className="divider-border" />
-        <span className="divider-text">{children}</span>
-        <div className="divider-border" />
-      </div>
-    );
-  };
-
   // const switchToLogin = () => {
   //   LoginOrSignupStore.update(s => {
   //     s.isLogin = true;
@@ -191,6 +171,67 @@ const SignUpPage: React.FC<SignUpComponentProps> = ({ toggleLogin }) => {
         console.error("Error signing in with Google", error);
       }
     };
+
+    const whatsThisStyle: CSSProperties = {
+      padding: '20px 10px 0 10px',
+      textDecoration: 'none',
+      color: '#4285F4'
+    };
+
+    const googleSignupButtonStyle: CSSProperties = {
+        borderRadius: '4px',
+        boxShadow: 'none',
+        color: 'var(--ion-color-dark)',
+        paddingTop: '0',
+        paddingBottom: '0',
+        paddingLeft: '0',
+        paddingRight: '0',
+        fontFamily: 'Roboto, arial, sans-serif',
+        fontSize: '16px',
+        fontWeight: '600',
+        letterSpacing: '0.25px',
+        height: '40px',
+        width: '90%', /* adjust as needed, but keep it consistent */
+        maxWidth: '400px',
+        minWidth: '240px',
+        margin: '0 auto', /* center the button */
+        transition: 'background-color .218s, border-color .218s, box-shadow .218s',
+        userSelect: 'none',
+        WebkitTapHighlightColor: 'transparent',
+        backgroundImage: 'url("../../public/googleSignUp.png")',
+        backgroundSize: 'cover', /* this will make the image cover the entire button */
+        backgroundPosition: 'center', /* centers the background image */
+        backgroundRepeat: 'no-repeat'
+      };
+
+      const signupButtonStyle: CSSProperties = {
+        borderRadius: '4px',
+        boxShadow: 'none',
+        color: 'var(--ion-color-dark)',
+        paddingTop: '0',
+        paddingBottom: '0',
+        paddingLeft: '0',
+        paddingRight: '0',
+        fontFamily: 'Roboto, arial, sans-serif',
+        fontSize: '16px',
+        fontWeight: '600',
+        letterSpacing: '0.25px',
+        height: '40px',
+        width: '90%', /* adjust as needed, but keep it consistent */
+        maxWidth: '400px',
+        minWidth: '240px',
+        margin: '0 auto', /* center the button */
+        transition: 'background-color .218s, border-color .218s, box-shadow .218s',
+        userSelect: 'none',
+        WebkitTapHighlightColor: 'transparent',
+        backgroundImage: 'url("../../public/signUp.png")',
+        backgroundSize: 'cover', /* this will make the image cover the entire button */
+        backgroundPosition: 'center', /* centers the background image */
+        backgroundRepeat: 'no-repeat'
+      };
+
+
+
 
 
 
@@ -284,7 +325,7 @@ const SignUpPage: React.FC<SignUpComponentProps> = ({ toggleLogin }) => {
               By signing up, you agree to our
               <br />
               <IonRouterLink 
-                className="terms-link"
+                style={{ textDecoration: 'none', cursor: 'pointer' }}
                 onClick={(e) => {
                   e.preventDefault();
                   setShowTermsModal(true);
@@ -300,7 +341,7 @@ const SignUpPage: React.FC<SignUpComponentProps> = ({ toggleLogin }) => {
       </div>
 
       <IonButton
-        className="signupBtn"
+        style={signupButtonStyle}
         fill="outline"
         expand="block"
         // // Disable the button if either email or password is invalid
@@ -328,7 +369,7 @@ const SignUpPage: React.FC<SignUpComponentProps> = ({ toggleLogin }) => {
       >
 
       <IonButton
-          className="googlesignupBtn"
+style={googleSignupButtonStyle}
           expand="block"
           fill="outline"
           onClick={handleGoogleSignUp}
@@ -356,7 +397,7 @@ const SignUpPage: React.FC<SignUpComponentProps> = ({ toggleLogin }) => {
   href="https://www.couponcatchapp.com/pricing#FAQ"
   target="_blank"
   rel="noopener noreferrer"
-  className="whatsthislink"
+  style={whatsThisStyle}
 >
   What's the catch?
 </a>
@@ -372,11 +413,12 @@ const SignUpPage: React.FC<SignUpComponentProps> = ({ toggleLogin }) => {
 
 
 {/* Terms and Conditions modal with Download button*/}
+<Suspense fallback={<div>Loading...</div>}>
       <TermsModal
         isOpen={showTermsModal}
         onDidDismiss={() => setShowTermsModal(false)}
       />
-
+</Suspense>
 
     </div>
 
