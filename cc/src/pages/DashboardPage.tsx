@@ -40,7 +40,7 @@ const DashboardPage: React.FC = () => {
 console.log("DashboardPage loaded");
 
   return (
-    <Suspense fallback={<IonPage><IonContent><IonLoading isOpen={true} message={'Please wait DASHBOARD...'} /></IonContent></IonPage>}>
+    <Suspense fallback={<IonPage><IonContent><IonLoading isOpen={true} message={'Please wait DASHBOARD...'} duration={100} /></IonContent></IonPage>}>
 
     <IonPage>
       <IonTabs>
