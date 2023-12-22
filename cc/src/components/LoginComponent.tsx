@@ -7,7 +7,7 @@ import {
   IonToast,
   IonLabel,
 } from "@ionic/react";
-import React, { useState, ReactNode } from "react";
+import React, { CSSProperties, useState, ReactNode } from "react";
 import "../styles/LoginComponentStyles.css";
 import { LoginOrSignupStore } from "../utils/store";
 import { useHistory } from "react-router-dom";
@@ -20,6 +20,7 @@ import {
 } from "../utils/fbAuth";
 import { IButtonContentProps } from "../utils/types";
 import EmailInput from "./EmailInput";
+import Divider from './Divider';
 import { ButtonContent } from '../components/ButtonContent';
 
 const auth = getAuth();
@@ -87,15 +88,6 @@ const LoginComponent: React.FC<LoginComponentProps> = ({ toggleLogin }) => {
       : setIsPasswordValid(false);
   };
 
-  const Divider = ({ children }: any) => {
-    return (
-      <div className="divider-container">
-        <div className="divider-border" />
-        <span className="divider-text">{children}</span>
-        <div className="divider-border" />
-      </div>
-    );
-  };
 
   // Handles the forgot password link click
   const handleForgotPasswordClick = async () => {
@@ -169,6 +161,59 @@ const handleFormSubmit = (event: React.FormEvent) => {
   event.preventDefault(); // Prevent the page from refreshing
   handleEmailPasswordSignIn();
 };
+
+const whatsThisStyle: CSSProperties = {
+  padding: '20px 10px 0 10px',
+  textDecoration: 'none',
+  color: '#4285F4'
+};
+
+
+const googleLoginBtnStyle: CSSProperties = {
+  borderRadius: '4px',
+  boxShadow: 'none',
+  paddingTop: '0',
+  paddingBottom: '0',
+  paddingLeft: '0',
+  paddingRight: '0',
+  fontFamily: "'Roboto', arial, sans-serif",
+  fontSize: '16px',
+  fontWeight: '600',
+  letterSpacing: '0.25px',
+  height: '40px',
+  width: '90%', /* adjust as needed, but keep it consistent */
+  maxWidth: '400px',
+  minWidth: '240px',
+  margin: '0 auto', /* center the button */
+  transition: 'background-color .218s, border-color .218s, box-shadow .218s',
+  userSelect: 'none',
+  WebkitTapHighlightColor: 'transparent',
+  backgroundImage: 'url("../../public/googleSignIn.png")',
+  backgroundSize: 'cover', /* this will make the image cover the entire button */
+  backgroundPosition: 'center', /* centers the background image */
+  backgroundRepeat: 'no-repeat',
+};
+
+const loginButtonStyle: CSSProperties = {
+    borderRadius: '4px',
+    boxShadow: 'none',
+    paddingTop: '0',
+    paddingBottom: '0',
+    paddingLeft: '0',
+    paddingRight: '0',
+    fontFamily: "'Roboto', arial, sans-serif",
+    fontSize: '16px',
+    fontWeight: '600',
+    letterSpacing: '0.25px',
+    height: '40px',
+    width: '90%', /* adjust as needed, but keep it consistent */
+    maxWidth: '400px',
+    minWidth: '240px',
+    margin: '0 auto', /* center the button */
+    transition: 'background-color .218s, border-color .218s, box-shadow .218s',
+    userSelect: 'none',
+    WebkitTapHighlightColor: 'transparent',
+  };
 
   return (
     <div>
@@ -247,7 +292,7 @@ const handleFormSubmit = (event: React.FormEvent) => {
           color={toast.color}
         />
       <IonButton
-        className="loginBtn"
+        style={loginButtonStyle}
         fill="outline"
         expand="block"
         // // Disable the button if either email or password is invalid
@@ -272,7 +317,7 @@ const handleFormSubmit = (event: React.FormEvent) => {
         }}
       >
         <IonButton
-          className="googleloginBtn"
+          style={googleLoginBtnStyle}
           expand="block"
           fill="outline"
           onClick={handleGoogleSignIn}
@@ -292,7 +337,7 @@ const handleFormSubmit = (event: React.FormEvent) => {
   href="https://www.couponcatchapp.com/pricing#FAQ"
   target="_blank"
   rel="noopener noreferrer"
-  className="whatsthislink"
+  style={whatsThisStyle}
 >
   What's the catch?
 </a>
