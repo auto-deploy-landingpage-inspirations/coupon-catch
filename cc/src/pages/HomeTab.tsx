@@ -9,7 +9,6 @@ import {
   IonToolbar,
 } from "@ionic/react";
 // import type { Animation } from "@ionic/react";
-import "../styles/HomeTabStyles.css";
 import { useHistory } from "react-router-dom";
 import { AuthStore, UserInfoStore } from "../utils/store";
 import { ReceiptStore } from "../utils/store";
@@ -142,6 +141,7 @@ const HomeTab: React.FC = () => {
   if (receipts.length === 0) {
     return <NoReceiptsComponent />;
   }
+  
 
   console.log
   console.log("HomeTab rendering");
@@ -153,14 +153,13 @@ const HomeTab: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <IonText>Hello</IonText>
-      {/* <ReceiptList 
+      <ReceiptList 
           receipts={receipts}
           mostRecentReceiptId={mostRecentReceiptId}
           onReceiptClick={handleReceiptClick}
           onPurchaseCouponUnlock={handlePurchaseCouponUnlock}
           onDeleteReceipt={handleDeleteReceipt}
-        /> */}
+        />
 
         {/* Include the DemoAccountNotice component */}
         <DemoUINotice uid={user.uid} />
