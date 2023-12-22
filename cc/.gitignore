@@ -31,3 +31,5 @@ yarn-error.log*
 /adtodb/node_modules
 /adtodb/package-lock.json
 /backend/node_modules
+
+/.firebase/*
