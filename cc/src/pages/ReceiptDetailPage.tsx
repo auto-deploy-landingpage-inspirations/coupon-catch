@@ -24,7 +24,7 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AuthStore } from "../utils/store";
 
@@ -44,7 +44,8 @@ import { useStoreState } from "pullstate";
 import { ReceiptStore } from "../utils/store";
 import { CouponStore } from "../utils/store";
 import NoEligibleItemsCard from "../components/NoEligibleItemsCard";
-import EligibleItemsCard from "../components/EligibleItemsCard";
+// import EligibleItemsCard from "../components/EligibleItemsCard";
+const EligibleItemsCard = React.lazy(() => import('../components/EligibleItemsCard'));
 
 const ReceiptDetailPage: React.FC = () => {
   const selectUid = (state: IAuthStore) => state.uid;
@@ -174,7 +175,7 @@ const ReceiptDetailPage: React.FC = () => {
 
       <div>
         <IonContent className="background-image">
-
+        <Suspense fallback={<IonSpinner />}>
         {
           receipt.daysLeft > 0 && receipt.unlockCouponTotal > 0 ? (
             <EligibleItemsCard
@@ -187,6 +188,7 @@ const ReceiptDetailPage: React.FC = () => {
             <NoEligibleItemsCard receipt={receipt} />
           )
         }
+        </Suspense>
  
 
 

@@ -32,10 +32,7 @@ const DashboardPage: React.FC = () => {
       import('./HomeTab'),
       import('./AddTab'),
       import('./SaleTab'),
-      import('./SaleDetailPage'),
       import('./AccountTab'),
-      import('./ReceiptDetailPage'),
-      import('./EditProfilePage')
     ];
     Promise.all(preloadModules);
   }, []);
@@ -96,19 +93,19 @@ console.log("DashboardPage loaded");
 
         {/* Tab Bar */}
         <IonTabBar slot="bottom" id="tab-bar">
-          <IonTabButton tab="home" href="/dashboard/home">
+          <IonTabButton tab="home" href="/dashboard/home" onClick={() => setCurrentTab('home')}>
             <IonIcon icon={home} />
             <IonLabel>Home</IonLabel>
           </IonTabButton>
-          <IonTabButton tab="add" href="/dashboard/add">
+          <IonTabButton tab="add" href="/dashboard/add" onClick={() => setCurrentTab('add')}>
             <IonIcon icon={add} />
             <IonLabel>Add</IonLabel>
           </IonTabButton>
-          <IonTabButton tab="sale" href="/dashboard/sale">
+          <IonTabButton tab="sale" href="/dashboard/sale" onClick={() => setCurrentTab('sale')}>
             <IonIcon icon={newspaper} />
             <IonLabel>Sale</IonLabel>
           </IonTabButton>
-          <IonTabButton tab="account" href="/dashboard/account">
+          <IonTabButton tab="account" href="/dashboard/account" onClick={() => setCurrentTab('account')}>
             <IonIcon icon={person} />
             <IonLabel>Account</IonLabel>
           </IonTabButton>

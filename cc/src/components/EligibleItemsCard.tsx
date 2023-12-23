@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { Suspense, useCallback, useState } from "react";
 import {
   IonCard,
   IonCardContent,
@@ -14,9 +14,12 @@ import { ICouponItem, IReceiptItem } from "../utils/types";
 import { UserInfoStore } from "../utils/store";
 import { ReceiptStore } from "../utils/store";
 import { AuthStore } from "../utils/store";
-import UnlockCouponsButton from './UnlockCouponsButton';
-import ListOfUnlockedItems from "./ListOfUnlockedItems";
-import RedeemCouponsButton from "./RedeemCouponsButton";
+const UnlockCouponsButton = React.lazy(() => import('./UnlockCouponsButton'));
+const ListOfUnlockedItems = React.lazy(() => import('./ListOfUnlockedItems'));
+const RedeemCouponsButton = React.lazy(() => import('./RedeemCouponsButton'));
+// import UnlockCouponsButton from './UnlockCouponsButton';
+// import ListOfUnlockedItems from "./ListOfUnlockedItems";
+// import RedeemCouponsButton from "./RedeemCouponsButton";
 
 
 interface EligibleItemsCardProps {
@@ -98,6 +101,7 @@ const EligibleItemsCard: React.FC<EligibleItemsCardProps> = ({
   }, [receipt.id, isDemoUser, setShowRedeemedAlert]);
 
   return (
+    <Suspense fallback={<IonSpinner />}>
     <IonCard className="background-translucent">
       <IonCardHeader>
         <IonCardTitle>
@@ -173,6 +177,7 @@ const EligibleItemsCard: React.FC<EligibleItemsCardProps> = ({
 
       </IonCardContent>
     </IonCard>
+    </Suspense>
   );
 };
 
