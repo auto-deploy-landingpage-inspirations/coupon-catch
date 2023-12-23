@@ -7,18 +7,14 @@ const DemoAccountNotice: React.FC<{ uid: string }> = ({ uid }) => {
   const [showDemoModal, setShowDemoModal] = useState(false);
 
   const blockStyle: CSSProperties = {
-    padding: '10px',
-    width: '100%',
-    height: '100px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center'
+    padding: '20px', 
+    overflowY: 'auto', 
+    height: '100%' 
   };
   
   const ionFabStyle: CSSProperties = {
-    margin: '0 0 -16px 0'
+    margin: '0 0 -16px 0',
+    position: 'fixed',
   };
   
   const floatingTextStyle: CSSProperties = {
@@ -58,7 +54,7 @@ const DemoAccountNotice: React.FC<{ uid: string }> = ({ uid }) => {
             onDidDismiss={() => setShowDemoModal(false)}
             initialBreakpoint={.2} breakpoints={[0, .2, .5, 1]}
           >
-              <div style={blockStyle}>
+<div style={blockStyle}>
                 <p>Thank you for checking out the demo account. Changes made here will not be saved through a refresh- changes are only displayed locally.</p>
                 <br />
                 <p>On non-demo, regular user accounts, this warning is not displayed and users have full access to persistent Firebase CRUD operations.</p>
