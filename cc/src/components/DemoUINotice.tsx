@@ -9,7 +9,8 @@ const DemoAccountNotice: React.FC<{ uid: string }> = ({ uid }) => {
   const blockStyle: CSSProperties = {
     padding: '20px', 
     overflowY: 'auto', 
-    height: '100%' 
+    height: '100%',
+    WebkitOverflowScrolling: 'touch' 
   };
   
   const ionFabStyle: CSSProperties = {
