@@ -22,7 +22,7 @@ import "../styles/AccountTabStyles.css";
 import { person, mail } from "ionicons/icons";
 import { getAuth, signOut, sendEmailVerification} from "../utils/fbAuth"
 import { useHistory } from "react-router-dom";
-import { useState, ReactNode, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { AuthStore } from "../utils/store";
 import { useEffect } from "react";
 const DemoUINotice = React.lazy(() => import("../components/DemoUINotice"));
