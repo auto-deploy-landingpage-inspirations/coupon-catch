@@ -20,8 +20,8 @@ const ReceiptList: React.FC<ReceiptListProps> = ({
   onDeleteReceipt,
 }) => {
     // const animatedItemRef = useRef<HTMLIonItemSlidingElement>(null);
- console.log("receipts at ReceiptList: ", receipts)
-    console.log("ReceiptList component rendering");
+//  console.log("receipts at ReceiptList: ", receipts)
+//     console.log("ReceiptList component rendering");
   return (
     <IonList>
       {receipts.map(receipt => (

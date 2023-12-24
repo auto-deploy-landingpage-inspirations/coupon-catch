@@ -105,8 +105,12 @@ const EligibleItemsCard: React.FC<EligibleItemsCardProps> = ({
     <IonCard className="background-translucent">
       <IonCardHeader>
         <IonCardTitle>
-          {receipt.daysLeft} days to redeem $
-          {receipt.unlockCouponTotal.toFixed(2)}
+          <div style={{ display: 'flex', alignItems: 'center', //space between
+          justifyContent: 'space-between', 
+          
+          }}>
+            {receipt.daysLeft} days <h3 style={{ marginBottom: '14px'}}>to redeem </h3> ${receipt.unlockCouponTotal.toFixed(2)}
+          </div>
         </IonCardTitle>
         {/* <IonCardSubtitle>Card Subtitle</IonCardSubtitle> */}
       </IonCardHeader>
