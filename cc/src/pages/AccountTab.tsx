@@ -1,3 +1,4 @@
+import React from "react";
 import {
   IonActionSheet,
   IonBadge,
@@ -27,7 +28,6 @@ import { useEffect } from "react";
 const DemoUINotice = React.lazy(() => import("../components/DemoUINotice"));
 import AmountSaved from "../components/AmountSaved";
 import { ButtonContent } from "../components/ButtonContent";
-import React from "react";
 
 const auth = getAuth();
 
