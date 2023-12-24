@@ -23,6 +23,9 @@ const EditProfilePage = React.lazy(() => import('./EditProfilePage'));
 import { home, add, newspaper, person } from "ionicons/icons";
 import ProtectedRoute from "../layouts/ProtectedRoutes";
 import HomeTabSkeleton from "../components/HomeTabSkeleton";
+import AccountTabSkeleton from "../components/AccountTabSkeleton";
+import SaleTabSkeleton from "../components/SaleTabSkeleton";
+import AddTabSkeleton from "../components/AddTabSkeleton";
 
 const DashboardPage: React.FC = () => {
   const [currentTab, setCurrentTab] = useState('home');
@@ -41,12 +44,12 @@ const DashboardPage: React.FC = () => {
     switch(currentTab) {
       case 'home':
         return <HomeTabSkeleton />;
-  //     case 'add':
-  //       // return <AddTabSkeleton />;
-  //     case 'sale':
-  //       // return <SaleTabSkeleton />;
-  //     case 'account':
-  //       // return <AccountTabSkeleton />;
+      case 'add':
+        return <AddTabSkeleton />;
+      case 'sale':
+        return <SaleTabSkeleton />;
+      case 'account':
+        return <AccountTabSkeleton />;
       default:
         return <IonLoading isOpen={true} message={'Please wait DASHBOARD...'} duration={10}/>;
     }
