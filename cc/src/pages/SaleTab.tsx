@@ -12,9 +12,9 @@ import {
 
 import "../styles/SaleTabStyles.css";
 import { useHistory } from "react-router";
-import { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { AuthStore } from "../utils/store";
-import DemoUINotice from "../components/DemoUINotice";
+const DemoUINotice = React.lazy(() => import("../components/DemoUINotice"));
 import { IAuthStore } from '../utils/store';
 import { useStoreState } from 'pullstate';
 
@@ -36,40 +36,45 @@ const SaleTab: React.FC = () => {
           <IonTitle>View sales</IonTitle>
         </IonToolbar>
       </IonHeader>
+
       <IonContent fullscreen>
-        <IonItem button={true} onClick={() => handleSalesAdClick("septmeber")}>
-          <IonBadge color="danger" slot="end">
-            Expired
-          </IonBadge>
-          <IonLabel>
-            <h2>Septemeber</h2>
-            <p>08/29 - 9/22</p>
+    <IonItem>
+      <IonLabel>
+            <h1>February</h1>
+            <h2>unreleased</h2>
           </IonLabel>
         </IonItem>
-        <IonItem button={true} onClick={() => handleSalesAdClick("october")}>
-          <IonBadge color="success" slot="end">
+
+        <IonItem button={true} onClick={() => handleSalesAdClick("january")}>
+        <IonBadge color="success" slot="end">
             Active
           </IonBadge>
           <IonLabel>
-            <h2>October</h2>
-            <p>9/27 - 10/22</p>
+            <h1>January</h1>
+            <h2>12/27 - 1/21</h2>
           </IonLabel>
         </IonItem>
-        <IonItem
-          button={true}
-          disabled={true}
-          onClick={() => handleSalesAdClick("november")}
+
+        <IonItem 
+        button={true}
+        disabled={true} 
+        onClick={() => handleSalesAdClick("december")}
         >
-          {/* <IonBadge color="success" slot="end">Active</IonBadge> */}
+        <IonBadge color="danger" slot="end">
+            Expired
+          </IonBadge>
+
           <IonLabel>
-            <h2>November</h2>
-            <p>unreleased</p>
+            <h1>December</h1>
+            <h2>11/20 - 12/24</h2>
           </IonLabel>
         </IonItem>
+
 
         {/* Include the DemoAccountNotice component */}
+        <Suspense>
         <DemoUINotice uid={uid} />
-
+        </Suspense>
       </IonContent>
     </IonPage>
   );

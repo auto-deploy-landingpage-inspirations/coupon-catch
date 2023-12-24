@@ -2,25 +2,12 @@ import {
   IonActionSheet,
   IonAlert,
   IonBackButton,
-  IonBadge,
   IonButton,
   IonButtons,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardSubtitle,
-  IonCardTitle,
   IonContent,
-  IonHeader,
   IonIcon,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonListHeader,
   IonPage,
-  IonSkeletonText,
   IonSpinner,
-  IonText,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
@@ -34,7 +21,7 @@ import React, {
 import { useParams } from "react-router-dom";
 import { AuthStore } from "../utils/store";
 
-import DemoUINotice from "../components/DemoUINotice";
+const DemoUINotice = React.lazy(() => import("../components/DemoUINotice"));
 import "../styles/ReceiptDetailPage.css";
 import { type } from "os";
 import { trashOutline } from "ionicons/icons";
@@ -74,11 +61,7 @@ const ReceiptDetailPage: React.FC = () => {
     [receipts, receiptId]
   );
 
-  // TODO: change this logic to wait for if the receipts have been loaded. If they have not we should display a skeleton loader
-  if (!receipt) {
-    return <NoReceiptDetailPage />; // Or some other error handling
-  }
-
+  
   const handleCheckout = useCallback(
     async (firebaseUserId: string, receiptId: string) => {
       try {
@@ -99,11 +82,14 @@ const ReceiptDetailPage: React.FC = () => {
       }
     },
     []
-  );
-
-  const handleOKOnUnlockAlert = useCallback(async () => {
-    // If the receipt ID is "FcoblaFPX5PFjQcWtkUh" and the user is a demo user,
-    // unlock the coupons without going to checkout
+    );
+    
+    const handleOKOnUnlockAlert = useCallback(async () => {
+      if (!receipt) {
+        return <NoReceiptDetailPage />; // Or some other error handling
+      }
+      // If the receipt ID is "FcoblaFPX5PFjQcWtkUh" and the user is a demo user,
+      // unlock the coupons without going to checkout
     if (receipt.id === "FcoblaFPX5PFjQcWtkUh" && isDemoUser) {
       ReceiptStore.update((s) => {
         const receiptIndex = s.receiptList.findIndex((r) => r.id === receiptId);
@@ -156,6 +142,11 @@ const ReceiptDetailPage: React.FC = () => {
       history.push("/dashboard/home");
     }
   }, [receiptId, isDemoUser]);
+  
+  // TODO: change this logic to wait for if the receipts have been loaded. If they have not we should display a skeleton loader
+  if (!receipt) {
+    return <NoReceiptDetailPage />; // Or some other error handling
+  }
 
   return (
     <IonPage>
@@ -168,7 +159,7 @@ const ReceiptDetailPage: React.FC = () => {
             fill="solid"
             color="danger"
             onClick={() => setShowDeleteActionSheet(true)}
-          >
+            >
             <ButtonContent loadingFor={loadingFor} buttonName="deletebutton">
               <IonIcon slot="start" icon={trashOutline}></IonIcon>
               Delete
@@ -288,7 +279,9 @@ const ReceiptDetailPage: React.FC = () => {
           />
 
           {/* Include the DemoAccountNotice component */}
-          <DemoUINotice uid={uid} />
+          <Suspense>
+        <DemoUINotice uid={uid} />
+        </Suspense>
         </IonContent>
       </div>
     </IonPage>

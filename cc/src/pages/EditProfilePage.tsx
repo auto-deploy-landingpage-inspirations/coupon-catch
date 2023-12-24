@@ -21,10 +21,10 @@ import {
   IonToggle,
   IonToolbar,
 } from "@ionic/react";
-import React from "react";
+import React, { Suspense } from "react";
 import { AuthStore } from "../utils/store";
 import { UserInfoStore } from "../utils/store";
-import DemoUINotice from "../components/DemoUINotice";
+const DemoUINotice = React.lazy(() => import("../components/DemoUINotice"));
 import "../styles/EditProfilePageStyles.css";
 
 const EditProfilePage = () => {
@@ -165,8 +165,9 @@ const EditProfilePage = () => {
         /> */}
 
         {/* Include the DemoAccountNotice component */}
+        <Suspense>
         <DemoUINotice uid={user.uid} />
-      </IonContent>
+        </Suspense>      </IonContent>
     </IonPage>
   );
 };

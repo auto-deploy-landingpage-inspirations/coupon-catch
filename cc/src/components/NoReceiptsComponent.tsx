@@ -1,7 +1,7 @@
 import { IonContent, IonHeader, IonIcon, IonPage, IonText, IonTitle, IonToolbar } from '@ionic/react';
 import { receiptOutline } from 'ionicons/icons';
-import React from 'react'
-import DemoUINotice from './DemoUINotice';
+import React, { Suspense } from 'react'
+const DemoUINotice = React.lazy(() => import("../components/DemoUINotice"));
 import { AuthStore } from '../utils/store';
 import { useStoreState } from 'pullstate';
 import { IAuthStore } from '../utils/store';
@@ -40,7 +40,9 @@ return (
     </div>
 
     {/* Include the DemoAccountNotice component */}
-    <DemoUINotice uid={uid} />
+    <Suspense>
+        <DemoUINotice uid={uid} />
+        </Suspense>
 
     </IonContent>
   </IonPage>

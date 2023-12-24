@@ -21,12 +21,13 @@ import "../styles/AccountTabStyles.css";
 import { person, mail } from "ionicons/icons";
 import { getAuth, signOut, sendEmailVerification} from "../utils/fbAuth"
 import { useHistory } from "react-router-dom";
-import { useState, ReactNode } from "react";
+import { useState, ReactNode, Suspense } from "react";
 import { AuthStore } from "../utils/store";
 import { useEffect } from "react";
-import DemoUINotice from "../components/DemoUINotice";
+const DemoUINotice = React.lazy(() => import("../components/DemoUINotice"));
 import AmountSaved from "../components/AmountSaved";
 import { ButtonContent } from "../components/ButtonContent";
+import React from "react";
 
 const auth = getAuth();
 
@@ -254,7 +255,10 @@ const AccountTab: React.FC = () => {
         />
 
         {/* Include the DemoAccountNotice component */}
+        <Suspense>
         <DemoUINotice uid={user.uid} />
+        </Suspense>
+
       </IonContent>
     </IonPage>
   );

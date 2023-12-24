@@ -11,7 +11,7 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import "../styles/AddTabStyles.css";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 
 import { usePhotoGallery } from "../hooks/usePhotoGallery";
 import { camera, images } from "ionicons/icons";
@@ -19,7 +19,7 @@ import { camera, images } from "ionicons/icons";
 // import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 // import { getFunctions, httpsCallable } from "firebase/functions";
 
-import DemoUINotice from "../components/DemoUINotice";
+const DemoUINotice = React.lazy(() => import("../components/DemoUINotice"));
 import { AuthStore } from "../utils/store";
 import { ReceiptStore } from "../utils/store";
 // import { getApp } from "firebase/app";
@@ -169,8 +169,9 @@ const AddTab: React.FC = () => {
         ></IonToast>
 
         {/* Include the DemoAccountNotice component */}
+        <Suspense>
         <DemoUINotice uid={uid} />
-
+        </Suspense>
       </IonContent>
     </IonPage>
   );
