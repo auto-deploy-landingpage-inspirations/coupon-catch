@@ -2040,6 +2040,13 @@
   "resolved" "https://registry.npmjs.org/@types/stack-utils/-/stack-utils-2.0.3.tgz"
   "version" "2.0.3"
 
+"@types/swiper@^6.0.0":
+  "integrity" "sha512-QPZRgxZ+ivXXtzV43B3LxpXUIC7FE/EoKM+rtxngmgt2M7eeUYypZhyqZD8UxJtlBcUDw/ATGoVeSNpvBBrz2w=="
+  "resolved" "https://registry.npmjs.org/@types/swiper/-/swiper-6.0.0.tgz"
+  "version" "6.0.0"
+  dependencies:
+    "swiper" "*"
+
 "@types/testing-library__jest-dom@^5.9.1":
   "integrity" "sha512-FSYhIjFlfOpGSRyVoMBMuS3ws5ehFQODymf3vlI7U1K8c7PHwWwFY7VREfmsuzHSOnoKs/9/Y983ayOs7eRzqw=="
   "resolved" "https://registry.npmjs.org/@types/testing-library__jest-dom/-/testing-library__jest-dom-5.14.9.tgz"
@@ -5834,10 +5841,10 @@
   "resolved" "https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz"
   "version" "1.0.0"
 
-"swiper@^11.0.4":
-  "integrity" "sha512-qtUxILrD4aD++rpKzGrkz3IAWL92f9uTrDwjb6HaNLmPvJhZCE/83DL+9w4kIgDDJeF6QKalV47rMBN77UOVYQ=="
-  "resolved" "https://registry.npmjs.org/swiper/-/swiper-11.0.4.tgz"
-  "version" "11.0.4"
+"swiper@*", "swiper@^11.0.5":
+  "integrity" "sha512-rhCwupqSyRnWrtNzWzemnBLMoyYuoDgGgspAm/8iBD3jCvAWycPLH4Z3TB0O5520DHLzMx94yUMH/B9Efpa48w=="
+  "resolved" "https://registry.npmjs.org/swiper/-/swiper-11.0.5.tgz"
+  "version" "11.0.5"
 
 "symbol-observable@^1.2.0":
   "integrity" "sha512-e900nM8RRtGhlV36KGEU9k65K3mPb1WV70OdjfxlG2EAuM1noi/E/BaW/uMhL7bPEssK8QV57vN3esixjUvcXQ=="
