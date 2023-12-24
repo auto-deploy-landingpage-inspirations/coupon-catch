@@ -22,13 +22,7 @@ const ProtectedRoute: React.FC<{
   if (!authChecked) {
       return <LoadingPage />;
     }
-//   return (
-//     <Route
-//       {...rest}
-//       render={(props) => isAuthed ? <Component {...props} /> : <Redirect to="/auth" />}
-//     />
-//   );
-// };
+
   // Early return for the authenticated route
   if (isAuthed) {
     return <Route {...rest} render={(props) => <Component {...props} />} />;

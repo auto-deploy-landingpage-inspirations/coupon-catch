@@ -36,6 +36,7 @@ import { ReceiptStore } from "../utils/store";
 import { CouponStore } from "../utils/store";
 import NoEligibleItemsCard from "../components/NoEligibleItemsCard";
 import { hi } from "date-fns/locale";
+import LoadingPage from "../components/LoadingPage";
 // import EligibleItemsCard from "../components/EligibleItemsCard";
 const EligibleItemsCard = React.lazy(
   () => import("../components/EligibleItemsCard")
@@ -171,7 +172,7 @@ const ReceiptDetailPage: React.FC = () => {
 
       <div>
         <IonContent className="background-image">
-          <Suspense fallback={<IonSpinner />}>
+        <Suspense fallback={<LoadingPage />}>
             {receipt.daysLeft > 0 && receipt.unlockCouponTotal > 0 ? (
               <EligibleItemsCard
                 receipt={receipt}

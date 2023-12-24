@@ -14,6 +14,7 @@ import { ICouponItem, IReceiptItem } from "../utils/types";
 import { UserInfoStore } from "../utils/store";
 import { ReceiptStore } from "../utils/store";
 import { AuthStore } from "../utils/store";
+import LoadingPage from "./LoadingPage";
 const UnlockCouponsButton = React.lazy(() => import('./UnlockCouponsButton'));
 const ListOfUnlockedItems = React.lazy(() => import('./ListOfUnlockedItems'));
 const RedeemCouponsButton = React.lazy(() => import('./RedeemCouponsButton'));
@@ -101,7 +102,7 @@ const EligibleItemsCard: React.FC<EligibleItemsCardProps> = ({
   }, [receipt.id, isDemoUser, setShowRedeemedAlert]);
 
   return (
-    <Suspense fallback={<IonSpinner />}>
+    <Suspense fallback={<LoadingPage />}>
     <IonCard className="background-translucent">
       <IonCardHeader>
         <IonCardTitle>

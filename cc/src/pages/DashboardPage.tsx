@@ -26,6 +26,7 @@ import HomeTabSkeleton from "../components/HomeTabSkeleton";
 import AccountTabSkeleton from "../components/AccountTabSkeleton";
 import SaleTabSkeleton from "../components/SaleTabSkeleton";
 import AddTabSkeleton from "../components/AddTabSkeleton";
+import LoadingPage from "../components/LoadingPage";
 
 const DashboardPage: React.FC = () => {
   const [currentTab, setCurrentTab] = useState('home');
@@ -51,7 +52,7 @@ const DashboardPage: React.FC = () => {
       case 'account':
         return <AccountTabSkeleton />;
       default:
-        return <IonLoading isOpen={true} message={'Please wait DASHBOARD...'} duration={10}/>;
+        return <LoadingPage />;
     }
   };
 
