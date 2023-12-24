@@ -78,6 +78,7 @@ const App: React.FC = () => {
 const receiptList = ReceiptStore.useState((s) => s.receiptList);
 const isCouponLoaded = CouponStore.useState((s) => s.isLoaded);
 const isReceiptsLoaded = ReceiptStore.useState((s) => s.isLoaded);
+const [isDemoCouponsApplied, setIsDemoCouponsApplied] = useState(false);
 
 // // useEffect for dark mode handling
 // useEffect(() => {
@@ -158,7 +159,7 @@ const isReceiptsLoaded = ReceiptStore.useState((s) => s.isLoaded);
   // useEffect for Coupon List Fetching
   useEffect(() => {
       if (!isAuthed) return;
-      const yearToFetch = "2023";
+      const yearToFetch = "2024";
       const unsubscribeFromCoupons = subToCollection(`sales/${yearToFetch}/coupons`, (couponListData) => {
         CouponStore.update((s) => {
           s.couponList = couponListData;
@@ -172,104 +173,146 @@ const isReceiptsLoaded = ReceiptStore.useState((s) => s.isLoaded);
       };
     }, [isAuthed]);
 
-    // hmm. yeah lets move logic to the backend. i dont need to get the whole damn firestore document or collection on initital load of the front end and make the front end do the logic, the backend should do the logic and send it to the front end. i can also make my firestore queires very fine tuned so im not sending the whole shabang of data over. in terms of determining my needs, i guess i need to think about what i want to show on the ui so i know how to shape the response of the server?
+  // useEffect for Receipts Fetching. This is done after isAuthed is true, and done differently for demo users and regular users
+  useEffect(() => {
+    if (!isAuthed) return;
 
-    // And when should I do the math on if the user has coupons avail or not? when the initial call for data (after user logs in) comes in? is there a way to do it before so its ready?
+    let unsubscribeReceipts: (() => void) | undefined;
+    let unsubscribeItemLines: (() => void) | undefined;
 
-    // soooooooooo actually just do queries with 'where' 'in' an the like in firestore
-
-
-
-
-// Define the function to perform calculations
-const calculateReceiptFields = (receipts: IReceiptItem[]) => {
-  const currentDate = new Date();
-  const couponEndDate = parse(couponList[0].couponEndDate, 'MM/dd/yyyy', currentDate);
-  let daysToCouponEnd = differenceInDays(couponEndDate, currentDate);
-
-  receipts.forEach(receipt => {
-    const dateOfPurchase = parse(receipt.dateOfPurchase, 'MM/dd/yyyy', currentDate);
-    const date30DaysFromPurchase = addDays(dateOfPurchase, 30);
-    let daysFromDoP = differenceInDays(date30DaysFromPurchase, currentDate);
-
-    const couponLookup = Object.fromEntries(couponList.map(coupon => [coupon.itemNumber, coupon]));
-
-    receipt.itemLines.forEach(itemLine => {
-      const coupon = couponLookup[itemLine.itemNumber];
-      if (coupon) {
-        if (typeof coupon.discount === 'number') {
-          itemLine.availCouponAmount += coupon.discount; // add the discount to the availCouponAmount
-        } else {
-          console.error(`Invalid discount for itemNumber ${itemLine.itemNumber}: ${coupon.discount}`);
+    const updateReceipts = async () => {
+      let receipts: IReceiptItem[] | undefined;
+      if (isDemoUser) {
+        receipts = await fetchReceiptsOnce(uid);
+        for (let receipt of receipts) {
+          const itemLines = await fetchItemLinesOnce(uid, [receipt.id]);
+          receipt.itemLines = itemLines;
         }
       } else {
-        // console.warn(`No coupon found for itemNumber ${itemLine.itemNumber}`);
+        // user is not demo user
+        unsubscribeReceipts = subToReceipts(uid, (data) => {
+          receipts = data;
+          const receiptIds = receipts.map(receipt => receipt.id);
+          unsubscribeItemLines = subToItemLines(uid, receiptIds, (itemLines) => {
+            if (!receipts) return;
+            for (let receipt of receipts) {
+              receipt.itemLines = itemLines.filter(itemLine => itemLine.receiptId === receipt.id);
+            }
+          });
+        });
       }
-    });
-    receipt.unlockCouponTotal = receipt.itemLines.reduce((total, itemLine) => total + Number(itemLine.availCouponAmount), 0);
+
+      if(receipts == undefined) return;
+
+      // calculateReceiptFields(receipts);
 
 
-    receipt.daysLeft = Math.max(0, Math.min(daysFromDoP, daysToCouponEnd));
-  });
-};
+      ReceiptStore.update((s) => {
+        if (receipts) {
+          s.receiptList = receipts;
+          s.isLoaded = true;
+        }
+      });
+    };
+
+    updateReceipts();
 
 
+    return () => {
+      if (unsubscribeReceipts) {
+        unsubscribeReceipts();
+      }
+      if (unsubscribeItemLines) {
+        unsubscribeItemLines();
+      }
+    };
+  }, [isAuthed, isDemoUser, uid]); // Add isCouponListLoading to the dependency array
 
-// original
-    // useEffect for Receipts Fetching. This is done after isAuthed is true, and done differently for demo users and regular users
-    useEffect(() => {
-      if (!isAuthed || !isCouponLoaded) return;
+  // useEffect for altering demo receipts before fields are calculated
+  useEffect(() => {
+    console.log("useEffect for Applying Coupons to demo user account, checking if isDemoUser, isReceiptsLoaded and isCouponLoaded")
+    if (isDemoUser && isReceiptsLoaded && isCouponLoaded) {
+      // index of coupon to edit, days ago to set date of purchase, number of coupons to apply
+      updateReceipt(0, 24, 5, couponList);
+      updateReceipt(1, 10, 2, couponList);
+      updateReceipt(2, 24, 0, couponList);
+      updateReceipt(3, 0, 0, couponList);
 
-      let unsubscribeReceipts: (() => void) | undefined;
-      let unsubscribeItemLines: (() => void) | undefined;
+      setIsDemoCouponsApplied(true);
+    }
+  }, [isReceiptsLoaded, isDemoUser, isCouponLoaded]);
 
-      const updateReceipts = async () => {
-        let receipts: IReceiptItem[] | undefined;
-        if (isDemoUser) {
-          receipts = await fetchReceiptsOnce(uid);
-          for (let receipt of receipts) {
-            const itemLines = await fetchItemLinesOnce(uid, [receipt.id]);
-            receipt.itemLines = itemLines;
-          }
-        } else {
-          // user is not demo user
-          unsubscribeReceipts = subToReceipts(uid, (data) => {
-            receipts = data;
-            const receiptIds = receipts.map(receipt => receipt.id);
-            unsubscribeItemLines = subToItemLines(uid, receiptIds, (itemLines) => {
-              if (!receipts) return;
-              for (let receipt of receipts) {
-                receipt.itemLines = itemLines.filter(itemLine => itemLine.receiptId === receipt.id);
+  // CalulateReceiptFeilds will fill in the daysLeft, unlockCouponTotal, and availCouponAmount fields on the returned receipts
+  // Define the function to perform calculations
+  const calculateReceiptFields = (receipts: IReceiptItem[]) => {
+    const currentDate = new Date();
+    const couponEndDate = parse(couponList[0].couponEndDate, 'MM/dd/yyyy', currentDate);
+    if (!couponEndDate) {
+      console.error('Failed to parse couponEndDate:', couponList[0].couponEndDate);
+      return;
+    }
+
+    let daysToCouponEnd = differenceInDays(couponEndDate, currentDate);
+
+    receipts.forEach(receipt => {
+      const dateOfPurchase = parse(receipt.dateOfPurchase, 'MM/dd/yyyy', currentDate);
+      const date30DaysFromPurchase = addDays(dateOfPurchase, 30);
+      let daysFromDoP = differenceInDays(date30DaysFromPurchase, currentDate);
+
+      const couponLookup = Object.fromEntries(couponList.map(coupon => [coupon.itemNumber, coupon]));
+
+      receipt.itemLines.forEach(itemLine => {
+        const coupon = couponLookup[itemLine.itemNumber];
+        if (coupon) {
+          if (typeof coupon.discount === 'number') {
+            // Update availCouponAmount in the Pullstate store
+            ReceiptStore.update(s => {
+              const receiptIndex = s.receiptList.findIndex(storeReceipt => storeReceipt.id === receipt.id);
+              if (receiptIndex !== -1) {
+                const itemLineIndex = s.receiptList[receiptIndex].itemLines.findIndex(storeItemLine => storeItemLine.id === itemLine.id);
+                if (itemLineIndex !== -1) {
+                  s.receiptList[receiptIndex].itemLines[itemLineIndex].availCouponAmount += coupon.discount;
+                }
               }
             });
-          });
-        }
-
-        if(receipts == undefined) return;
-
-        calculateReceiptFields(receipts);
- 
-
-        ReceiptStore.update((s) => {
-          if (receipts) {
-            s.receiptList = receipts;
-            s.isLoaded = true;
+          } else {
+            console.error(`Invalid discount for itemNumber ${itemLine.itemNumber}: ${coupon.discount}`);
           }
-        });
-      };
-
-      updateReceipts();
-
-
-      return () => {
-        if (unsubscribeReceipts) {
-          unsubscribeReceipts();
+        } else {
+          // console.warn(`No coupon found for itemNumber ${itemLine.itemNumber}`);
         }
-        if (unsubscribeItemLines) {
-          unsubscribeItemLines();
+      });
+
+      // Calculate unlockCouponTotal and daysLeft after updating availCouponAmount
+      ReceiptStore.update(s => {
+        const index = s.receiptList.findIndex(storeReceipt => storeReceipt.id === receipt.id);
+        if (index !== -1) {
+          const unlockCouponTotal = s.receiptList[index].itemLines.reduce((total, itemLine) => total + Number(itemLine.availCouponAmount), 0);
+          const daysLeft = Math.max(0, Math.min(daysFromDoP, daysToCouponEnd));
+
+          s.receiptList[index].unlockCouponTotal = unlockCouponTotal;
+          s.receiptList[index].daysLeft = daysLeft;
         }
-      };
-    }, [isAuthed, isDemoUser, uid, isCouponLoaded]); // Add isCouponListLoading to the dependency array
+      });
+    });
+  };
+
+
+  // useEffect for calculating receipt fields
+  useEffect(() => {
+    console.log("useEffect for calculating receipt fields, checking if isReceiptsLoaded and isCouponLoaded")
+    if (isDemoUser) {
+      if (isReceiptsLoaded && isCouponLoaded && isDemoCouponsApplied) {
+        calculateReceiptFields(receiptList);
+      }
+    } else {
+      if (isReceiptsLoaded && isCouponLoaded) {
+        calculateReceiptFields(receiptList);
+      }
+    }
+  }, [isReceiptsLoaded, isCouponLoaded, isDemoUser, isDemoCouponsApplied]);
+
+
 
 
     // useEffect for User Data Fetching. This is done after isAuthed is true, and done differently for demo users and regular users
@@ -301,73 +344,61 @@ const calculateReceiptFields = (receipts: IReceiptItem[]) => {
     }, [isAuthed, isDemoUser, uid]); // Dependencies array
     
 
-  // useEffect for Applying Coupons to demo user account
-  // useEffect(() => {
-  //   if (isDemoUser) {
-  //     updateReceipt(0, 24, 5, couponList);
-  //     updateReceipt(1, 10, 2, couponList);
-  //     updateReceipt(2, 24, 0, couponList);
-  //     updateReceipt(3, 37, 0, couponList);
 
-  //     UserInfoStore.update((s) => {
-  //       s.isDemoCouponApplied = true;
-  //     });
-  //   }
-  // }, [isReceiptsLoaded, isDemoUser]);
 
-  // const updateReceipt = (
-  //   receiptIndex: any,
-  //   daysAgo: number,
-  //   numberOfCoupons: number = 0,
-  //   couponList: typeof ICouponList
-  // ) => {
-  //   // Update the date of purchase
-  //   const receiptDate = new Date();
-  //   receiptDate.setDate(receiptDate.getDate() - daysAgo);
-  //   const receiptDateString = `${
-  //     receiptDate.getMonth() + 1
-  //   }/${receiptDate.getDate()}/${receiptDate.getFullYear()}`;
+  const updateReceipt = (
+    receiptIndex: any,
+    daysAgo: number,
+    numberOfCoupons: number = 0,
+    couponList: typeof ICouponList
+  ) => {
+    // Update the date of purchase
+    const receiptDate = new Date();
+    receiptDate.setDate(receiptDate.getDate() - daysAgo);
+    const receiptDateString = `${
+      receiptDate.getMonth() + 1
+    }/${receiptDate.getDate()}/${receiptDate.getFullYear()}`;
 
-  //   ReceiptStore.update((s) => {
-  //     if (receiptIndex >= 0 && receiptIndex < s.receiptList.length) {
-  //       s.receiptList[receiptIndex].dateOfPurchase = receiptDateString;
-  //     }
-  //   });
+    ReceiptStore.update((s) => {
+      if (receiptIndex >= 0 && receiptIndex < s.receiptList.length) {
+        s.receiptList[receiptIndex].dateOfPurchase = receiptDateString;
+      }
+    });
 
-  //   // Update the receipt's item lines with selected coupons if there are any
-  //   if (numberOfCoupons > 0) {
-  //     // Filter coupons with discount less than $10 and randomly pick 'numberOfCoupons' items
-  //     const eligibleCoupons = couponList.filter(
-  //       (coupon) => coupon.discount < 10
-  //     );
 
-  //     const selectedCoupons: ICouponItem[] = [];
-  //     while (
-  //       selectedCoupons.length < numberOfCoupons &&
-  //       eligibleCoupons.length > 0
-  //     ) {
-  //       const randomIndex = Math.floor(Math.random() * eligibleCoupons.length);
-  //       selectedCoupons.push(...eligibleCoupons.splice(randomIndex, 1));
-  //     }
+    // Update the receipt's item lines with selected coupons if there are any
+    // if (numberOfCoupons > 0) then we need to identify the coupons that are less than $10 and pick the first five items
+      // if (numberOfCoupons > 0) {
 
-  //     // Update the receipt's item lines with selected coupons
-  //     ReceiptStore.update((s) => {
-  //       if (receiptIndex >= 0 && receiptIndex < s.receiptList.length) {
-  //         const receipt = s.receiptList[receiptIndex];
+      //   // Make the array of the first five coupons that are less than $10, push the coupons to the array
+      //   const eligibleCoupons: ICouponItem[] = [];
+      //   couponList.forEach((coupon, index: number) => {
+      //     if (coupon.discount < 10 && eligibleCoupons.length < 5) {
+      //       eligibleCoupons.push(coupon);
+      //     }
+      //   });
 
-  //         selectedCoupons.forEach((coupon, index: number) => {
-  //           if (receipt.itemLines && receipt.itemLines.length > index) {
-  //             const itemLine = receipt.itemLines[index];
+      //   // Apply the coupons to the receipt's line items. This is done by picking the first "numberOfCoupons" items from the receipt's line items, and changing the item number and availCouponAmount to the selected coupon's item number and discount amount.
+      //   ReceiptStore.update((s) => {
+      //     if (receiptIndex >= 0 && receiptIndex < s.receiptList.length) {
+      //       const receipt = s.receiptList[receiptIndex];
+      
+      //       eligibleCoupons.forEach((coupon, index: number) => {
+      //         if (receipt.itemLines && receipt.itemLines.length > index) {
+      //           const itemLine = receipt.itemLines[index];
+      
+      //           // Update item number and coupon amount
+      //           itemLine.itemNumber = Number(coupon.itemNumber);
+      //           itemLine.availCouponAmount = Number(coupon.discount);
+      
+      //           // Check if the item line was updated
+      //           console.log(`Updated item line ${index}:`, itemLine);
+      //         }
+      //       });
+      //     }
+      //   });
 
-  //             // Update item number and coupon amount
-  //             itemLine.itemNumber = Number(coupon.itemNumber);
-  //             itemLine.availCouponAmount = Number(coupon.discount);
-  //           }
-  //         });
-  //       }
-  //     });
-  //   }
-  // };
+  };
 
   // Return early if auth state has not been checked
   if (!authChecked) {
@@ -382,7 +413,7 @@ const calculateReceiptFields = (receipts: IReceiptItem[]) => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen color="light">
-      <IonLoading isOpen={true} message={"Loading APP..."} />
+      <IonLoading isOpen={true} message={"Loading..."} />
         </IonContent>
         </IonPage>    
 );
