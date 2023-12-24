@@ -80,7 +80,7 @@ const AuthPage: React.FC = () => {
       </div>
 
       <IonText style={styles.footerText}>
-        &copy; 2023 Coupon Catch by Skypher LLC
+          &copy; {new Date().getFullYear()} Coupon Catch by Skypher LLC
       </IonText>
     </IonContent>
   );
