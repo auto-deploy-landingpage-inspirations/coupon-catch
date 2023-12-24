@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useMemo, useCallback } from "react";
+import { useRef, useEffect, useState, useMemo, useCallback, Suspense } from "react";
 import {
   createAnimation,
   IonContent,
@@ -21,13 +21,13 @@ import { ICouponItem, IReceiptItem } from "../utils/types";
 
 import HomeTabSkeleton from "../components/HomeTabSkeleton";
 import NoReceiptsComponent from "../components/NoReceiptsComponent";
-import DemoUINotice from "../components/DemoUINotice";
+const DemoUINotice = React.lazy(() => import("../components/DemoUINotice"));
 import ReceiptList from "../components/ReceiptsList";
 
 const HomeTab: React.FC = () => {
   const history = useHistory();
   const receipts = ReceiptStore.useState((s) => s.receiptList);
-  const isLoaded = ReceiptStore.useState(s => s.isLoaded);
+  const receiptsIsLoaded = ReceiptStore.useState(s => s.isLoaded);
   const user = AuthStore.useState((s) => s.user);
   const isDemoUser = AuthStore.useState((s) => s.isDemoUser);
   // const [mostRecentReceiptId, setMostRecentReceiptId] = useState<
@@ -134,12 +134,12 @@ const HomeTab: React.FC = () => {
   //   return <HomeTabSkeleton />;
   // }
 
-  if (!isLoaded) {
+  if (!receiptsIsLoaded) {
     return <HomeTabSkeleton />;
   }
 
   // add check for state to make sure that receipts are fetched.
-  if (receipts.length === 0 && isLoaded) {
+  if (receipts.length === 0 && receiptsIsLoaded) {
     return <NoReceiptsComponent />;
   }
   
@@ -163,8 +163,9 @@ const HomeTab: React.FC = () => {
         />
 
         {/* Include the DemoAccountNotice component */}
+        <Suspense>
         <DemoUINotice uid={user.uid} />
-
+        </Suspense>
       </IonContent>
     </IonPage>
   );
