@@ -143,6 +143,23 @@ const HomeTab: React.FC = () => {
     return <NoReceiptsComponent />;
   }
   
+  // Sort receipts into two groups and then by daysLeft or dateOfPurchase
+const sortedReceipts = [...receipts].sort((a, b) => {
+  // Group by whether daysLeft > 0 and unlockCouponTotal > 0
+  const aGroup = a.daysLeft > 0 && a.unlockCouponTotal > 0;
+  const bGroup = b.daysLeft > 0 && b.unlockCouponTotal > 0;
+
+  if (aGroup !== bGroup) {
+    // If the receipts are in different groups, sort so that the group where daysLeft > 0 and unlockCouponTotal > 0 comes first
+    return aGroup ? -1 : 1;
+  } else if (aGroup && bGroup) {
+    // If both receipts are in the group where daysLeft > 0 and unlockCouponTotal > 0, sort by daysLeft (ascending)
+    return a.daysLeft - b.daysLeft;
+  } else {
+    // If both receipts are in the group where daysLeft <= 0 or unlockCouponTotal <= 0, sort by dateOfPurchase (descending)
+    return new Date(b.dateOfPurchase).getTime() - new Date(a.dateOfPurchase).getTime();
+  }
+});
 
   console.log
   console.log("HomeTab rendering");
@@ -155,7 +172,7 @@ const HomeTab: React.FC = () => {
       </IonHeader>
       <IonContent fullscreen>
       <ReceiptList 
-          receipts={receipts}
+          receipts={sortedReceipts}
           mostRecentReceiptId={mostRecentReceiptId}
           onReceiptClick={handleReceiptClick}
           onPurchaseCouponUnlock={handlePurchaseCouponUnlock}
