@@ -30,22 +30,22 @@ const ListOfUnlockedItems: React.FC<ListOfUnlockedItemsProps> = ({
 
 
   return (
-    <IonList>
+<IonList style={{ width: '100%' }}>
       <IonListHeader>
-        <IonLabel style={{ flex: "1" }}>
+        <IonLabel style={{ flex: "1", textAlign: 'center' }}>
           <h1>Item #</h1>
         </IonLabel>
-        <IonLabel style={{ flex: "1" }}>
+        <IonLabel style={{ flex: "1", textAlign: 'center' }}>
           <h1>Desc</h1>
         </IonLabel>
-        <IonLabel style={{ flex: "1" }}>
+        <IonLabel style={{ flex: "1", textAlign: 'center' }}>
           <h1>Cpn Amt</h1>
         </IonLabel>
       </IonListHeader>
 
       {receipt.isUnlocked
         ? couponItemsFromReceipt.map((item: any, index: any) => (
-            <IonItem key={index}>
+            <IonItem key={index} style={{ width: '118%', marginLeft: '-16px' }}>
               <IonCheckbox
               mode="ios"
                 slot="start"
@@ -56,7 +56,7 @@ const ListOfUnlockedItems: React.FC<ListOfUnlockedItemsProps> = ({
                 aria-label={`Select item ${item.itemNumber}`}
               />
               <IonLabel style={{ flex: "0 0 23%" }}>{item.itemNumber}</IonLabel>
-              <IonLabel style={{ flex: "0 0 50%" }}>{item.desc}</IonLabel>
+              <IonLabel style={{ flex: "0 0 50%" }}>{item.itemDesc}</IonLabel>
               <IonLabel style={{ flex: "0 0 15%" }}>
                 ${item.availCouponAmount.toFixed(2)}
               </IonLabel>
