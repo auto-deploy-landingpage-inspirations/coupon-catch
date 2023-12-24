@@ -8,6 +8,7 @@
 import { Redirect, Route } from 'react-router-dom';
 import { AuthStore } from "../utils/store";
 import { IonLoading } from '@ionic/react';
+import LoadingPage from '../components/LoadingPage';
 
 const ProtectedRoute: React.FC<{
   component: React.ElementType;
@@ -19,7 +20,7 @@ const ProtectedRoute: React.FC<{
 
     // Early return for loading state
   if (!authChecked) {
-      return <IonLoading isOpen={true} message={"Loading PROTECTED ROUTES..."} />;
+      return <LoadingPage />;
     }
 //   return (
 //     <Route
