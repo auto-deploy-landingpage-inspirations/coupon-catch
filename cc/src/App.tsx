@@ -233,10 +233,10 @@ const [isDemoCouponsApplied, setIsDemoCouponsApplied] = useState(false);
     console.log("useEffect for Applying Coupons to demo user account, checking if isDemoUser, isReceiptsLoaded and isCouponLoaded")
     if (isDemoUser && isReceiptsLoaded && isCouponLoaded) {
       // index of coupon to edit, days ago to set date of purchase, number of coupons to apply
-      updateReceipt(0, 24, 5, couponList);
-      updateReceipt(1, 10, 2, couponList);
-      updateReceipt(2, 24, 0, couponList);
-      updateReceipt(3, 0, 0, couponList);
+      alterDemoReceipt(0, 24, 5, couponList);
+      alterDemoReceipt(1, 10, 2, couponList);
+      alterDemoReceipt(2, 24, 0, couponList);
+      alterDemoReceipt(3, 0, 0, couponList);
 
       setIsDemoCouponsApplied(true);
     }
@@ -346,7 +346,7 @@ const [isDemoCouponsApplied, setIsDemoCouponsApplied] = useState(false);
 
 
 
-  const updateReceipt = (
+  const alterDemoReceipt = (
     receiptIndex: any,
     daysAgo: number,
     numberOfCoupons: number = 0,
