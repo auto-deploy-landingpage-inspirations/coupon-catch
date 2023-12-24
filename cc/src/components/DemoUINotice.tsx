@@ -1,10 +1,23 @@
 // DemoAccountNotice.tsx
-import React, { CSSProperties, useState } from 'react';
+import React, { CSSProperties, useEffect, useState } from 'react';
 import { IonFab, IonFabButton, IonIcon, IonModal, IonButton } from '@ionic/react';
 import { informationCircle } from 'ionicons/icons';
 
 const DemoAccountNotice: React.FC<{ uid: string }> = ({ uid }) => {
   const [showDemoModal, setShowDemoModal] = useState(false);
+
+  useEffect(() => {
+    if (showDemoModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+
+    // Clean up function
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [showDemoModal]);
 
   const blockStyle: CSSProperties = {
     padding: '20px', 
