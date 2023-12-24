@@ -1,4 +1,4 @@
-import { collection, writeBatch, setDoc, doc, getFirestore, onSnapshot, where, getDocs, updateDoc, getDoc, query } from "firebase/firestore"; 
+import { collection, writeBatch, setDoc, doc, getFirestore, onSnapshot, where, getDocs, updateDoc, getDoc, query, orderBy, limit, deleteDoc } from "firebase/firestore"; 
 
 import { AuthStore, IUserInfoStore } from "./store";
 import { initializeApp } from "firebase/app";
@@ -302,7 +302,6 @@ export const deleteReceiptInFb = async (receiptId: string) => {
     return { success: false, error: error };
   }
 }
-
 
 
 export {collection, db};
