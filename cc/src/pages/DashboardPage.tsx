@@ -58,7 +58,8 @@ const DashboardPage: React.FC = () => {
 console.log("DashboardPage loaded");
 
   return (
-    <Suspense fallback={getFallbackComponent()}>
+    // <Suspense fallback={getFallbackComponent()}>
+    <Suspense>
 
     <IonPage>
       <IonTabs>
