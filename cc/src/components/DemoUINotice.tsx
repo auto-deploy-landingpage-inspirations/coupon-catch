@@ -8,14 +8,24 @@ const DemoAccountNotice: React.FC<{ uid: string }> = ({ uid }) => {
 
   useEffect(() => {
     if (showDemoModal) {
-      document.body.style.overflow = 'hidden';
+      // Save the current scroll position
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
     } else {
-      document.body.style.overflow = 'auto';
+      // Restore the original position and scroll position
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      window.scrollTo(0, parseInt(scrollY || '0') * -1);
     }
 
     // Clean up function
     return () => {
-      document.body.style.overflow = 'auto';
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      window.scrollTo(0, parseInt(scrollY || '0') * -1);
     };
   }, [showDemoModal]);
 
