@@ -1,6 +1,6 @@
 // DemoAccountNotice.tsx
 import React, { CSSProperties, useEffect, useState } from 'react';
-import { IonFab, IonFabButton, IonIcon, IonModal, IonButton } from '@ionic/react';
+import { IonFab, IonFabButton, IonIcon, IonModal, IonButton, IonContent } from '@ionic/react';
 import { informationCircle } from 'ionicons/icons';
 
 const DemoAccountNotice: React.FC<{ uid: string }> = ({ uid }) => {
@@ -78,7 +78,7 @@ const DemoAccountNotice: React.FC<{ uid: string }> = ({ uid }) => {
             onDidDismiss={() => setShowDemoModal(false)}
             initialBreakpoint={.2} breakpoints={[0, .2, .5, 1]}
           >
-<div style={blockStyle}>
+  <IonContent style={blockStyle}>
                 <p>Thank you for checking out the demo account. Changes made here will not be saved through a refresh- changes are only displayed locally.</p>
                 <br />
                 <p>On non-demo, regular user accounts, this warning is not displayed and users have full access to persistent Firebase CRUD operations.</p>
@@ -94,7 +94,7 @@ const DemoAccountNotice: React.FC<{ uid: string }> = ({ uid }) => {
                 <p><b>Firebase</b> was utitlized for other essential services such as <b>Auth</b>, <b>Firestore</b>  for real-time <b>NoSQL</b> database,  </p>
                 
                 <p>The app transcends traditional limits with <b>Capacitor's PWA</b> plugins, offering native-like features in a web app environment, optimizing user experience and functionality.</p>
-              </div>
+              </IonContent>
             <IonButton onClick={() => setShowDemoModal(false)}>Close Modal</IonButton>
           </IonModal>
         </>
