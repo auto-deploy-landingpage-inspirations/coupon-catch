@@ -6,31 +6,9 @@ import { informationCircle } from 'ionicons/icons';
 const DemoAccountNotice: React.FC<{ uid: string }> = ({ uid }) => {
   const [showDemoModal, setShowDemoModal] = useState(false);
 
-  useEffect(() => {
-    if (showDemoModal) {
-      // Save the current scroll position
-      const scrollY = window.scrollY;
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-    } else {
-      // Restore the original position and scroll position
-      const scrollY = document.body.style.top;
-      document.body.style.position = '';
-      document.body.style.top = '';
-      window.scrollTo(0, parseInt(scrollY || '0') * -1);
-    }
-
-    // Clean up function
-    return () => {
-      const scrollY = document.body.style.top;
-      document.body.style.position = '';
-      document.body.style.top = '';
-      window.scrollTo(0, parseInt(scrollY || '0') * -1);
-    };
-  }, [showDemoModal]);
-
   const blockStyle: CSSProperties = {
     padding: '20px', 
+    margin: '20px',
     overflowY: 'auto', 
     height: '100%',
     WebkitOverflowScrolling: 'touch' 
@@ -61,15 +39,15 @@ const DemoAccountNotice: React.FC<{ uid: string }> = ({ uid }) => {
       {uid === 'rSGEP4KpEMaZBVkpI9Uc6ViWQG63' && (
         <>
           {/* IonFab to trigger the modal */}
-          <IonFab style={ionFabStyle} vertical="bottom" horizontal="end" slot="fixed">
-            <IonFabButton color="danger" size="small" onClick={() => setShowDemoModal(true)}>
-              <IonIcon icon={informationCircle} />
-            </IonFabButton>
-          </IonFab>
 
           {/* Floating Text Container */}
           <div style={floatingTextStyle}>
             DEMO ACCT-RERESH CLEARS CHANGES
+          <IonFab style={ionFabStyle} vertical="bottom">
+            <IonFabButton color="danger" size="small" onClick={() => setShowDemoModal(true)}>
+              <IonIcon icon={informationCircle} />
+            </IonFabButton>
+          </IonFab>
           </div>
 
           {/* IonModal */}
@@ -78,7 +56,7 @@ const DemoAccountNotice: React.FC<{ uid: string }> = ({ uid }) => {
             onDidDismiss={() => setShowDemoModal(false)}
             initialBreakpoint={.2} breakpoints={[0, .2, .5, 1]}
           >
-  <IonContent style={blockStyle}>
+  <IonContent style={blockStyle} className="ion-padding">
                 <p>Thank you for checking out the demo account. Changes made here will not be saved through a refresh- changes are only displayed locally.</p>
                 <br />
                 <p>On non-demo, regular user accounts, this warning is not displayed and users have full access to persistent Firebase CRUD operations.</p>
