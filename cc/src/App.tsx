@@ -56,7 +56,7 @@ import { CouponStore } from "./utils/store";
 import { updateUserSettings } from "./utils/miscUtils";
 import { getAuth } from "./utils/fbAuth";
 import { listeners } from "process";
-import { differenceInDays, addDays, parse } from 'date-fns';
+import { differenceInDays, addDays, parse, set } from 'date-fns';
 // import { DarkModeStore } from "./utils/store";
 import { ICouponList } from "./utils/types";
 
@@ -77,7 +77,7 @@ const App: React.FC = () => {
   const uid = AuthStore.useState((s) => s.uid);
 const receiptList = ReceiptStore.useState((s) => s.receiptList);
 const isCouponLoaded = CouponStore.useState((s) => s.isLoaded);
-const isReceiptsLoaded = ReceiptStore.useState((s) => s.isLoaded);
+const [isReceiptsFetched, setIsReceiptsFetched] = useState(false);
 const [isDemoCouponsApplied, setIsDemoCouponsApplied] = useState(false);
 
 // // useEffect for dark mode handling
@@ -158,7 +158,8 @@ const [isDemoCouponsApplied, setIsDemoCouponsApplied] = useState(false);
 
   // useEffect for Coupon List Fetching
   useEffect(() => {
-      if (!isAuthed) return;
+    console.log(`uid before running CouponFetch effect: ${uid}`); // Log the value of uid
+      if (!uid) return;
       const yearToFetch = "2024";
       const unsubscribeFromCoupons = subToCollection(`sales/${yearToFetch}/coupons`, (couponListData) => {
         CouponStore.update((s) => {
@@ -171,11 +172,13 @@ const [isDemoCouponsApplied, setIsDemoCouponsApplied] = useState(false);
       return () => {
         if (unsubscribeFromCoupons) unsubscribeFromCoupons();
       };
-    }, [isAuthed]);
+    }, [uid]);
 
   // useEffect for Receipts Fetching. This is done after isAuthed is true, and done differently for demo users and regular users
   useEffect(() => {
-    if (!isAuthed) return;
+    console.log(`uid before running ReceiptsFetch effect: ${uid}`); // Log the value of uid
+
+    if (!uid) return;
 
     let unsubscribeReceipts: (() => void) | undefined;
     let unsubscribeItemLines: (() => void) | undefined;
@@ -210,9 +213,9 @@ const [isDemoCouponsApplied, setIsDemoCouponsApplied] = useState(false);
       ReceiptStore.update((s) => {
         if (receipts) {
           s.receiptList = receipts;
-          s.isLoaded = true;
         }
       });
+      setIsReceiptsFetched(true);
     };
 
     updateReceipts();
@@ -226,25 +229,29 @@ const [isDemoCouponsApplied, setIsDemoCouponsApplied] = useState(false);
         unsubscribeItemLines();
       }
     };
-  }, [isAuthed, isDemoUser, uid]); // Add isCouponListLoading to the dependency array
+  }, [uid]); // Add isCouponListLoading to the dependency array
 
   // useEffect for altering demo receipts before fields are calculated
   useEffect(() => {
-    console.log("useEffect for Applying Coupons to demo user account, checking if isDemoUser, isReceiptsLoaded and isCouponLoaded")
-    if (isDemoUser && isReceiptsLoaded && isCouponLoaded) {
+    console.log(`isReceiptsFetched before running DemoReceiptAlter effect: ${isReceiptsFetched}`); // Log the value of isReceiptsFetched
+    console.log("useEffect for Applying Coupons to demo user account, checking if isDemoUser, isReceiptsFetched and isCouponLoaded")
+    if (!uid) return;
+    if (isDemoUser && isReceiptsFetched && isCouponLoaded) {
       // index of coupon to edit, days ago to set date of purchase, number of coupons to apply
-      alterDemoReceipt(0, 24, 5, couponList);
+      alterDemoReceipt(0, 24, 3, couponList);
       alterDemoReceipt(1, 10, 2, couponList);
-      alterDemoReceipt(2, 24, 0, couponList);
+      alterDemoReceipt(2, 22, 1, couponList);
       alterDemoReceipt(3, 0, 0, couponList);
 
+      // set isDemoCouponsApplied to true pullstate in ReceiptStore
       setIsDemoCouponsApplied(true);
     }
-  }, [isReceiptsLoaded, isDemoUser, isCouponLoaded]);
+  }, [isReceiptsFetched]);
 
   // CalulateReceiptFeilds will fill in the daysLeft, unlockCouponTotal, and availCouponAmount fields on the returned receipts
   // Define the function to perform calculations
   const calculateReceiptFields = (receipts: IReceiptItem[]) => {
+    if (!uid) return;
     const currentDate = new Date();
     const couponEndDate = parse(couponList[0].couponEndDate, 'MM/dd/yyyy', currentDate);
     if (!couponEndDate) {
@@ -261,6 +268,8 @@ const [isDemoCouponsApplied, setIsDemoCouponsApplied] = useState(false);
 
       const couponLookup = Object.fromEntries(couponList.map(coupon => [coupon.itemNumber, coupon]));
 
+      // demo user has its own coupon check etc.
+      if (!isDemoUser) {
       receipt.itemLines.forEach(itemLine => {
         const coupon = couponLookup[itemLine.itemNumber];
         if (coupon) {
@@ -282,6 +291,7 @@ const [isDemoCouponsApplied, setIsDemoCouponsApplied] = useState(false);
           // console.warn(`No coupon found for itemNumber ${itemLine.itemNumber}`);
         }
       });
+    };
 
       // Calculate unlockCouponTotal and daysLeft after updating availCouponAmount
       ReceiptStore.update(s => {
@@ -300,51 +310,21 @@ const [isDemoCouponsApplied, setIsDemoCouponsApplied] = useState(false);
 
   // useEffect for calculating receipt fields
   useEffect(() => {
-    console.log("useEffect for calculating receipt fields, checking if isReceiptsLoaded and isCouponLoaded")
-    if (isDemoUser) {
-      if (isReceiptsLoaded && isCouponLoaded && isDemoCouponsApplied) {
+    console.log(`isReceiptsFetched before running ReceiptFieldsCalc effect: ${isReceiptsFetched}`); // Log the value of isReceiptsFetched
+    console.log(`isDemoCouponsApplied before running ReceiptFieldsCalc effect: ${isDemoCouponsApplied}`); // Log the value of isDemoCouponsApplied
+    if (!uid) return;
+
+    console.log("useEffect for calculating receipt fields,")
+    if (isDemoUser && isDemoCouponsApplied) {
         calculateReceiptFields(receiptList);
-      }
-    } else {
-      if (isReceiptsLoaded && isCouponLoaded) {
+    } else if (!isDemoUser && isReceiptsFetched && isCouponLoaded) {
         calculateReceiptFields(receiptList);
-      }
     }
-  }, [isReceiptsLoaded, isCouponLoaded, isDemoUser, isDemoCouponsApplied]);
-
-
-
-
-    // useEffect for User Data Fetching. This is done after isAuthed is true, and done differently for demo users and regular users
-    useEffect(() => {
-      // Only proceed if user is authenticated
-      if (!isAuthed) return;
+    ReceiptStore.update(s => {
+      s.isCalculated = true;
+    })
+  }, [isReceiptsFetched, isDemoCouponsApplied]);
     
-      let unsubscribeUserData: (() => void) | undefined;
-    
-      if (isDemoUser) {
-        // Fetch user data for demo users
-        fetchDocOnce(`users/${uid}`).then(userData => {
-          updateUserSettings(userData, uid);
-        });
-         
-      } else {
-        // Subscribe to user data for regular users
-        unsubscribeUserData = subToDoc(`users/${uid}/info/settings`, (userData) => {
-          updateUserSettings(userData, uid);
-        });
-      }
-    
-      // Return a cleanup function
-      return () => {
-        if (unsubscribeUserData) {
-          unsubscribeUserData();
-        }
-      };
-    }, [isAuthed, isDemoUser, uid]); // Dependencies array
-    
-
-
 
   const alterDemoReceipt = (
     receiptIndex: any,
@@ -365,39 +345,78 @@ const [isDemoCouponsApplied, setIsDemoCouponsApplied] = useState(false);
       }
     });
 
-
     // Update the receipt's item lines with selected coupons if there are any
-    // if (numberOfCoupons > 0) then we need to identify the coupons that are less than $10 and pick the first five items
-      // if (numberOfCoupons > 0) {
-
-      //   // Make the array of the first five coupons that are less than $10, push the coupons to the array
-      //   const eligibleCoupons: ICouponItem[] = [];
-      //   couponList.forEach((coupon, index: number) => {
-      //     if (coupon.discount < 10 && eligibleCoupons.length < 5) {
-      //       eligibleCoupons.push(coupon);
-      //     }
-      //   });
-
-      //   // Apply the coupons to the receipt's line items. This is done by picking the first "numberOfCoupons" items from the receipt's line items, and changing the item number and availCouponAmount to the selected coupon's item number and discount amount.
-      //   ReceiptStore.update((s) => {
-      //     if (receiptIndex >= 0 && receiptIndex < s.receiptList.length) {
-      //       const receipt = s.receiptList[receiptIndex];
+    if (numberOfCoupons > 0) {
+      // Filter the couponList to only include coupons under $10
+      const underTenCoupons = couponList.filter(coupon => coupon.discount < 10);
+    
+      // Shuffle the underTenCoupons array
+      for (let i = underTenCoupons.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [underTenCoupons[i], underTenCoupons[j]] = [underTenCoupons[j], underTenCoupons[i]];
+      }
+    
+      // Take the first "numberOfCoupons" items from the shuffled array
+      const eligibleCoupons = underTenCoupons.slice(0, 10);
       
-      //       eligibleCoupons.forEach((coupon, index: number) => {
-      //         if (receipt.itemLines && receipt.itemLines.length > index) {
-      //           const itemLine = receipt.itemLines[index];
-      
-      //           // Update item number and coupon amount
-      //           itemLine.itemNumber = Number(coupon.itemNumber);
-      //           itemLine.availCouponAmount = Number(coupon.discount);
-      
-      //           // Check if the item line was updated
-      //           console.log(`Updated item line ${index}:`, itemLine);
-      //         }
-      //       });
-      //     }
-      //   });
+      console.log("eligibleCoupons:", eligibleCoupons)
 
+      // Apply the coupons to the receipt's line items. 
+      // 1. check if the receiptIndex is valid, and make sure the index is within the length of the receiptList
+      // 2. check if the receipt has itemLines
+      // 3. Loop through the array of itemLines numberOfCoupons number of times, and for the each item, change the item number and availCouponAmount to the selected coupon's item number and discount amount (coupon.discount). (The first item is given the first coupon, the second item the second coupon, etc.)
+      ReceiptStore.update((s) => {
+        if (receiptIndex >= 0 && receiptIndex < s.receiptList.length) {
+          const receipt = s.receiptList[receiptIndex];
+
+          if (receipt.itemLines) {
+            for (let i = 0; i < numberOfCoupons; i++) {
+              const itemLine = receipt.itemLines[i];
+              const coupon = eligibleCoupons[i];
+
+              // Check if itemLine and coupon are not undefined
+              if (itemLine && coupon) {
+                // Update item number and coupon amount
+                itemLine.itemNumber = Number(coupon.itemNumber);
+                itemLine.availCouponAmount = Number(coupon.discount);
+
+                // Check if the item line was updated
+                console.log(`Updated item line ${i}:`, itemLine);
+              }
+            }
+          }
+        }
+      });
+
+
+
+
+
+
+
+
+
+
+      // //This is done by picking the first "numberOfCoupons" items from the receipt's line items, and changing the item number and availCouponAmount to the selected coupon's item number and discount amount.
+      // ReceiptStore.update((s) => {
+      //   if (receiptIndex >= 0 && receiptIndex < s.receiptList.length) {
+      //     const receipt = s.receiptList[receiptIndex];
+
+      //     eligibleCoupons.forEach((coupon, index: number) => {
+      //       if (receipt.itemLines && receipt.itemLines.length > index) {
+      //         const itemLine = receipt.itemLines[index];
+
+      //         // Update item number and coupon amount
+      //         itemLine.itemNumber = Number(coupon.itemNumber);
+      //         itemLine.availCouponAmount = Number(coupon.discount);
+
+      //         // Check if the item line was updated
+      //         console.log(`Updated item line ${index}:`, itemLine);
+      //       }
+      //     });
+      //   }
+      // });
+    }
   };
 
   // Return early if auth state has not been checked
@@ -419,8 +438,6 @@ const [isDemoCouponsApplied, setIsDemoCouponsApplied] = useState(false);
 );
   }
 
-console.log("here is receipts list", receiptList);
-  console.log("App is rendering. User isAuthed:", isAuthed);
   return (
     <IonApp>
       <IonReactRouter>
@@ -437,12 +454,12 @@ console.log("here is receipts list", receiptList);
           <Route path="/auth" component={AuthPage} exact={true} />
           <Redirect
             from="/"
-            to={isAuthed ? "/dashboard/home" : "/auth"}
+            to={uid ? "/dashboard/home" : "/auth"}
             exact={true}
           />
           {/* This route catches all typed in urls that are not defined above and redirects to the auth page. */}
           <Route
-            component={() => (isAuthed ? <DashboardPage /> : <AuthPage />)}
+            component={() => (uid ? <DashboardPage /> : <AuthPage />)}
           />
         </IonRouterOutlet>
       </IonReactRouter>
