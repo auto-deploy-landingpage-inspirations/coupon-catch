@@ -17,6 +17,9 @@ const ProtectedRoute: React.FC<{
 }> = ({ component: Component, ...rest }) => {
   const isAuthed = AuthStore.useState(s => s.isAuthed);
   const authChecked = AuthStore.useState(s => s.authChecked);
+  const uid = AuthStore.useState(s => s.user.uid);
+
+  console.log('ProtectedRoute:', { uid, authChecked });
 
     // Early return for loading state
   if (!authChecked) {
