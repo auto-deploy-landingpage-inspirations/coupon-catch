@@ -37,6 +37,7 @@ import { CouponStore } from "../utils/store";
 import NoEligibleItemsCard from "../components/NoEligibleItemsCard";
 import { hi } from "date-fns/locale";
 import LoadingPage from "../components/LoadingPage";
+import ReceiptDetailSkeleton from "../components/ReceiptDetailSkeleton";
 // import EligibleItemsCard from "../components/EligibleItemsCard";
 const EligibleItemsCard = React.lazy(
   () => import("../components/EligibleItemsCard")
@@ -47,6 +48,7 @@ const ReceiptDetailPage: React.FC = () => {
   const uid = useStoreState(AuthStore, selectUid);
   const { receiptId } = useParams<{ receiptId: string }>();
   const receipts = ReceiptStore.useState((s) => s.receiptList);
+  const receiptsIsCalculated = ReceiptStore.useState((s) => s.isCalculated);
   const couponList = CouponStore.useState((s) => s.couponList);
   const history = useHistory();
   // loadingFor state to track which button is loading
@@ -62,7 +64,6 @@ const ReceiptDetailPage: React.FC = () => {
     [receipts, receiptId]
   );
 
-  
   const handleCheckout = useCallback(
     async (firebaseUserId: string, receiptId: string) => {
       try {
@@ -83,15 +84,14 @@ const ReceiptDetailPage: React.FC = () => {
       }
     },
     []
-    );
-    
-    const handleOKOnUnlockAlert = useCallback(async () => {
-      if (!receipt) {
-        return <NoReceiptDetailPage />; // Or some other error handling
-      }
-      // If the receipt ID is "FcoblaFPX5PFjQcWtkUh" and the user is a demo user,
-      // unlock the coupons without going to checkout
-    if (receipt.id === "FcoblaFPX5PFjQcWtkUh" && isDemoUser) {
+  );
+
+  const handleOKOnUnlockAlert = useCallback(async () => {
+    if (!receipt) {
+      return <NoReceiptDetailPage />; // Or some other error handling
+    }
+    // unlock the coupons without going to checkout if its the index0 receipt (according to alterDemoReceipt func in App.tsx) and the user is a demo user
+    if (receipt.id === "AS2dF5AIhw4y5aker7zX" && isDemoUser) {
       ReceiptStore.update((s) => {
         const receiptIndex = s.receiptList.findIndex((r) => r.id === receiptId);
         if (receiptIndex !== -1) {
@@ -99,8 +99,9 @@ const ReceiptDetailPage: React.FC = () => {
         }
       });
     }
-    // If the receipt ID is "GLME3VtKiKPUXhxVVWdA", then trigger the checkout
-    else if (receipt.id === "GLME3VtKiKPUXhxVVWdA" && isDemoUser) {
+
+    // send the user to the checkout page if its the index1 receipt (according to alterDemoReceipt func in App.tsx) and the user is a demo user
+    else if (receipt.id === "fOyICtWVZk8qy3pbXcFy" && isDemoUser) {
       await handleCheckout(uid, receiptId);
 
       setTimeout(() => {
@@ -114,7 +115,17 @@ const ReceiptDetailPage: React.FC = () => {
         });
       }, 5000);
     }
-    // For all other cases (including non-demo users), trigger the checkout and unlock process
+
+    // on the index receipt (according to alterDemoReceipt func in App.tsx) and the user is a demo user, allow the user to fully checkout
+    else if (receipt.id === "MXWjbTg3zMbvRvlHIcxJ" && isDemoUser) {
+      ReceiptStore.update((s) => {
+        const receiptIndex = s.receiptList.findIndex((r) => r.id === receiptId);
+        if (receiptIndex !== -1) {
+          s.receiptList[receiptIndex].isUnlocked = true;
+        }
+      });
+    }
+    // For all other cases, trigger the checkout and unlock process
     else {
       await handleCheckout(uid, receiptId);
     }
@@ -143,10 +154,20 @@ const ReceiptDetailPage: React.FC = () => {
       history.push("/dashboard/home");
     }
   }, [receiptId, isDemoUser]);
-  
-  // TODO: change this logic to wait for if the receipts have been loaded. If they have not we should display a skeleton loader
-  if (!receipt) {
+
+
+  if (!receiptsIsCalculated) {
+    return <ReceiptDetailSkeleton />;
+  }
+
+
+
+  if (!receipt && receiptsIsCalculated) {
     return <NoReceiptDetailPage />; // Or some other error handling
+  }
+  
+  if (!receipt) {
+    return
   }
 
   return (
@@ -160,7 +181,7 @@ const ReceiptDetailPage: React.FC = () => {
             fill="solid"
             color="danger"
             onClick={() => setShowDeleteActionSheet(true)}
-            >
+          >
             <ButtonContent loadingFor={loadingFor} buttonName="deletebutton">
               <IonIcon slot="start" icon={trashOutline}></IonIcon>
               Delete
@@ -172,7 +193,7 @@ const ReceiptDetailPage: React.FC = () => {
 
       <div>
         <IonContent className="background-image">
-        <Suspense fallback={<LoadingPage />}>
+          <Suspense fallback={<LoadingPage />}>
             {receipt.daysLeft > 0 && receipt.unlockCouponTotal > 0 ? (
               <EligibleItemsCard
                 receipt={receipt}
@@ -196,9 +217,8 @@ const ReceiptDetailPage: React.FC = () => {
               {
                 text: "Cancel",
                 role: "cancel",
-                handler: () => {
-                  // history.push("/dashboard/home");
-                },
+                // handler: () => {
+                // },
               },
               {
                 text: "OK",
@@ -281,8 +301,8 @@ const ReceiptDetailPage: React.FC = () => {
 
           {/* Include the DemoAccountNotice component */}
           <Suspense>
-        <DemoUINotice uid={uid} />
-        </Suspense>
+            <DemoUINotice uid={uid} />
+          </Suspense>
         </IonContent>
       </div>
     </IonPage>
