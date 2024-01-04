@@ -86,7 +86,7 @@ export const subToItemLines = (userId: string, receiptIds: string[], onItemLines
         couponNum: doc.data().couponNum,
         isRedeemed: doc.data().isRedeemed,
         itemDesc: doc.data().itemDesc,
-        availCouponAmount: doc.data().availCouponAmount,
+        availCouponAmount: 0,
         origPurchasedCouponAmt: doc.data().origPurchasedCouponAmt,
       }));
       itemLines.push(...receiptItemLines);
@@ -98,7 +98,7 @@ export const subToItemLines = (userId: string, receiptIds: string[], onItemLines
 
 // Subscribe to a single document
 export const subToDoc = (path: string, onDocUpdated: (docData: any) => void) => {
-  console.log(`Fetching document from ${path}`);
+  console.log(`Subscribing to document from ${path}`);
   const docRef = doc(db, path);
   const unsubscribe = onSnapshot(docRef, (docSnapshot) => {
     if (docSnapshot.exists()) {
@@ -116,7 +116,7 @@ export const subToDoc = (path: string, onDocUpdated: (docData: any) => void) => 
 
 // Fetch collection data once
 export const fetchCollectionOnce = async (path: string) => {
-  console.log(`Fetching data from ${path}`);
+  console.log(`Fetching collection ONCE from ${path}`);
   const querySnapshot = await getDocs(collection(db, path));
   console.log(`Data fetched from ${path}`);
   return querySnapshot.docs.map(doc => ({
@@ -168,7 +168,7 @@ export const fetchItemLinesOnce = async (userId: string, receiptIds: string[]) =
       couponNum: doc.data().couponNum,
       isRedeemed: doc.data().isRedeemed,
       itemDesc: doc.data().itemDesc,
-      availCouponAmount: doc.data().availCouponAmount,
+      availCouponAmount: 0,
       origPurchasedCouponAmt: doc.data().origPurchasedCouponAmt,
     }));
     itemLines.push(...receiptItemLines);
@@ -238,14 +238,13 @@ export const fetchUserData = (userId: string, onUserDataUpdated: (userData: any)
 
 
 // WRITES-----------------------------------------------------------------------
-// need to chnage this to find the receipt in the receipts/ collection where the receiptId matches the receiptId passed in, and the same for userId
 export const markReceiptUnlocked = async (userId: string, receiptId: string) => {
   try {
     const receiptPath = `receipts/${receiptId}`;
     const receiptRef = doc(db, receiptPath);
 
     await updateDoc(receiptRef, {
-      isUnlocked: false,
+      isUnlocked: true,
     });
 
     return { success: true };
