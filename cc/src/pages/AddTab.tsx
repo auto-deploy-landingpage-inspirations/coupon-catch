@@ -1,11 +1,13 @@
 import {
   IonButton,
-  IonChip,
   IonCol,
   IonContent,
+  IonGrid,
   IonHeader,
   IonIcon,
   IonPage,
+  IonRow,
+  IonText,
   IonTitle,
   IonToast,
   IonToolbar,
@@ -13,7 +15,7 @@ import {
 import "../styles/AddTabStyles.css";
 import React, { useState, useEffect, Suspense } from "react";
 
-import { usePhotoGallery } from "../hooks/usePhotoGallery";
+import { UserPhoto, usePhotoGallery } from "../hooks/usePhotoGallery";
 import { camera, images } from "ionicons/icons";
 // create an import firebaseStorage from the /utils/firebaseConfig.ts file
 // import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -25,15 +27,19 @@ import { ReceiptStore } from "../utils/store";
 // import { getApp } from "firebase/app";
 // import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 
-import { IAuthStore } from '../utils/store';
-import { useStoreState } from 'pullstate';
-
+import { IAuthStore } from "../utils/store";
+import { useStoreState } from "pullstate";
+import CameraButton from "../components/CameraButton";
+import GalleryButton from "../components/GalleryButton";
+import { set } from "date-fns";
+import ConfirmButton from "../components/ConfirmButton";
 
 const AddTab: React.FC = () => {
   const selectUid = (state: IAuthStore) => state.uid;
   const uid = useStoreState(AuthStore, selectUid);
   const idToken = AuthStore.useState((s) => s.idToken);
   const { takePhoto } = usePhotoGallery();
+  const [photo, setPhoto] = useState<UserPhoto | null>(null); // State to hold the taken photo
   const [toast, setToast] = useState({
     isOpen: false,
     message: "",
@@ -42,18 +48,28 @@ const AddTab: React.FC = () => {
 
   const handleTakePhoto = async () => {
     try {
-      // Step 1: Get photo selection from user
       console.log("Attempting to capture photo...");
       const latestPhoto = await takePhoto();
 
+      setPhoto(latestPhoto);
       if (!latestPhoto || !latestPhoto.webviewPath) {
         console.error("No photo taken or WebviewPath is undefined.");
         return;
       }
+    } catch (error) {
+      console.error("Error in handleTakePhoto:", error);
+    }
+  };
 
-      // Step 2: Convert to blob, upload to Firebase Storage
-      // 2a - Get the blob
-      const blobResponse = await fetch(latestPhoto.webviewPath);
+  const handleConfirmUpload = async () => {
+    if (!photo || !photo.webviewPath) {
+      console.error("No photo to upload.");
+      return;
+    }
+
+    try {
+      // Step 1: Convert to blob, upload to Firebase Storage
+      const blobResponse = await fetch(photo.webviewPath);
       const blob = await blobResponse.blob();
 
       // Add check if blob is empty
@@ -81,19 +97,19 @@ const AddTab: React.FC = () => {
 
       if (response.ok) {
         const resultText = await response.text(); // Get the text response
-        
+
         try {
           const result = JSON.parse(resultText); // Try to parse it as JSON
-      
+
           if (result && result.receipt) {
             // Generate a random 4-digit number and assign it as the id of the receipt
             const randomId = Math.floor(1000 + Math.random() * 9000); // Generates a number between 1000 and 9999
             result.receipt.id = `useradded${randomId}`;
-      
+
             // Attach item lines to the receipt
             result.receipt.itemLines = result.itemLines;
-      
-            // Add the receipt to the user's receipts 
+
+            // Add the receipt to the user's receipts
             ReceiptStore.update((s) => {
               s.receiptList.push(result.receipt);
             });
@@ -117,7 +133,6 @@ const AddTab: React.FC = () => {
           color: "danger",
         });
       }
-
     } catch (error) {
       console.error("Error in handleTakePhoto:", error);
       // Handle the error
@@ -132,31 +147,44 @@ const AddTab: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <div
-          className="ion-text-center ion-padding-top"
-          style={{
-            maxWidth: "260px",
-            margin: "0 auto",
-            paddingTop: "200px",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          <IonButton
-            style={{ margin: "auto 0", textTransform: "none", width: "144px" }}
-            onClick={handleTakePhoto}
-          >
-            <IonIcon aria-hidden="true" icon={images} />
-          </IonButton>
-          &nbsp;
-          <IonButton
-            style={{ margin: "auto 0", textTransform: "none", width: "144px" }}
-            onClick={handleTakePhoto}
-          >
-            <IonIcon aria-hidden="true" icon={camera} />
-          </IonButton>
-        </div>
+        <IonGrid>
+          <IonRow className="ion-justify-content-center ion-align-items-start">
+            <IonCol size="10" sizeMd="6" sizeLg="4">
+              <div className="ion-text-center">
+                <IonText>
+                  <h2>Take a photo of your receipt</h2>
+                </IonText>
+              </div>
+            </IonCol>
+            <IonCol size="12">
+              {/* Display the thumbnail if a photo has been taken */}
+              {photo?.webviewPath && (
+                <div className="photo-preview">
+                  <img src={photo.webviewPath} alt="Preview" />
+                </div>
+              )}
+            </IonCol>
+            <IonCol size="12" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              {photo && (
+    <ConfirmButton handleConfirmUpload={handleConfirmUpload} />
+
+              )}
+            </IonCol>
+
+            <IonCol size="12">
+              <div className="ion-text-center ion-padding-top">
+                <IonRow>
+                  <IonCol>
+                    <GalleryButton handleTakePhoto={handleTakePhoto} />
+                  </IonCol>
+                  <IonCol>
+                    <CameraButton handleTakePhoto={handleTakePhoto} />
+                  </IonCol>
+                </IonRow>
+              </div>
+            </IonCol>
+          </IonRow>
+        </IonGrid>
 
         <IonToast
           isOpen={toast.isOpen}
@@ -170,7 +198,7 @@ const AddTab: React.FC = () => {
 
         {/* Include the DemoAccountNotice component */}
         <Suspense>
-        <DemoUINotice uid={uid} />
+          <DemoUINotice uid={uid} />
         </Suspense>
       </IonContent>
     </IonPage>
