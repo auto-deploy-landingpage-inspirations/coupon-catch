@@ -15,6 +15,7 @@ import { UserInfoStore } from "../utils/store";
 import { ReceiptStore } from "../utils/store";
 import { AuthStore } from "../utils/store";
 import LoadingPage from "./LoadingPage";
+import { markReceiptUnlocked } from "../utils/fbFirestore";
 const UnlockCouponsButton = React.lazy(() => import('./UnlockCouponsButton'));
 const ListOfUnlockedItems = React.lazy(() => import('./ListOfUnlockedItems'));
 const RedeemCouponsButton = React.lazy(() => import('./RedeemCouponsButton'));
@@ -45,8 +46,8 @@ const EligibleItemsCard: React.FC<EligibleItemsCardProps> = ({
   const handleUnlockCouponsButton = useCallback(async () => {
     setLoadingFor("unlockbutton");
     try {
-      if (isPayingUser != true) {
-        // await markReceiptUnlocked(uid, receipt.id);
+      if (isPayingUser == true) {
+        await markReceiptUnlocked(uid, receipt.id);
         ReceiptStore.update((s) => {
           const receiptIndex = s.receiptList.findIndex(
             (r) => r.id === receipt.id
