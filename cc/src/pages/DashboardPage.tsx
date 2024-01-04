@@ -40,6 +40,7 @@ const DashboardPage: React.FC = () => {
     ];
     Promise.all(preloadModules);
   }, []);
+  
 
   const getFallbackComponent = () => {
     switch(currentTab) {
@@ -84,7 +85,7 @@ console.log("DashboardPage loaded");
             path="/dashboard/account"
             component={AccountTab}
           />
-                    <ProtectedRoute
+          <ProtectedRoute
             exact
             path="/dashboard/account/edit-profile"
             component={EditProfilePage}
