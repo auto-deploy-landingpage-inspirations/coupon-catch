@@ -27,9 +27,13 @@ import ReceiptList from "../components/ReceiptsList";
 const HomeTab: React.FC = () => {
   const history = useHistory();
   const receipts = ReceiptStore.useState((s) => s.receiptList);
-  const receiptsIsLoaded = ReceiptStore.useState(s => s.isLoaded);
   const user = AuthStore.useState((s) => s.user);
   const isDemoUser = AuthStore.useState((s) => s.isDemoUser);
+  // const isDemoCouponsApplied = ReceiptStore.useState((s) => s.isDemoCouponsApplied);
+  const receiptsIsCalculated = ReceiptStore.useState((s) => s.isCalculated);
+  const receiptsIsSorted = ReceiptStore.useState((s) => s.isSorted);
+  const [sortedReceipts, setSortedReceipts] = useState<IReceiptItem[]>([]);
+
   // const [mostRecentReceiptId, setMostRecentReceiptId] = useState<
   //   string | undefined
   // >(undefined);
@@ -43,6 +47,37 @@ const HomeTab: React.FC = () => {
       new Date(receipt.createdAt) > new Date(max.createdAt) ? receipt : max
     ).id;
   }, [receipts]);
+
+  useEffect(() => {
+    // Sort receipts into two groups and then by daysLeft or dateOfPurchase
+  // Sort receipts into two groups and then by daysLeft or dateOfPurchase
+  const sorted = [...receipts].sort((a, b) => {
+    // Group by whether daysLeft > 0 and unlockCouponTotal > 0
+    const aGroup = a.daysLeft > 0 && a.unlockCouponTotal > 0;
+    const bGroup = b.daysLeft > 0 && b.unlockCouponTotal > 0;
+  
+    if (aGroup !== bGroup) {
+      // If the receipts are in different groups, sort so that the group where daysLeft > 0 and unlockCouponTotal > 0 comes first
+      return aGroup ? -1 : 1;
+    } else if (aGroup && bGroup) {
+      // If both receipts are in the group where daysLeft > 0 and unlockCouponTotal > 0, sort by daysLeft (ascending)
+      return a.daysLeft - b.daysLeft;
+    } else {
+      // If both receipts are in the group where daysLeft <= 0 or unlockCouponTotal <= 0, sort by dateOfPurchase (descending)
+      return new Date(b.dateOfPurchase).getTime() - new Date(a.dateOfPurchase).getTime();
+    }
+  });
+
+    // Set the sorted receipts
+    setSortedReceipts(sorted);
+  
+    // Update isSorted after the sorting operation is complete
+    ReceiptStore.update((s) => {
+      s.isSorted = true;
+    });
+
+  }, [receipts]); // Run this effect whenever 'receipts' changes
+
 
   // useRef to track the element
     // const animatedItemRef = useRef<any>(null);
@@ -130,36 +165,20 @@ const HomeTab: React.FC = () => {
     }
   }, [user.uid, isDemoUser]);
 
-  // if (isDemoUser && !isDemoCouponApplied) {
-  //   return <HomeTabSkeleton />;
-  // }
 
-  if (!receiptsIsLoaded) {
+  if (!receiptsIsSorted) {
     return <HomeTabSkeleton />;
   }
 
-  // add check for state to make sure that receipts are fetched.
-  if (receipts.length === 0 && receiptsIsLoaded) {
+  // add check for state to make sure that receipts are calcualted
+  if (receipts.length === 0 && receiptsIsSorted) {
+    return <HomeTabSkeleton />;
+  }
+
+  if (receipts.length === 0) {
     return <NoReceiptsComponent />;
   }
   
-  // Sort receipts into two groups and then by daysLeft or dateOfPurchase
-const sortedReceipts = [...receipts].sort((a, b) => {
-  // Group by whether daysLeft > 0 and unlockCouponTotal > 0
-  const aGroup = a.daysLeft > 0 && a.unlockCouponTotal > 0;
-  const bGroup = b.daysLeft > 0 && b.unlockCouponTotal > 0;
-
-  if (aGroup !== bGroup) {
-    // If the receipts are in different groups, sort so that the group where daysLeft > 0 and unlockCouponTotal > 0 comes first
-    return aGroup ? -1 : 1;
-  } else if (aGroup && bGroup) {
-    // If both receipts are in the group where daysLeft > 0 and unlockCouponTotal > 0, sort by daysLeft (ascending)
-    return a.daysLeft - b.daysLeft;
-  } else {
-    // If both receipts are in the group where daysLeft <= 0 or unlockCouponTotal <= 0, sort by dateOfPurchase (descending)
-    return new Date(b.dateOfPurchase).getTime() - new Date(a.dateOfPurchase).getTime();
-  }
-});
 
   console.log
   console.log("HomeTab rendering");
