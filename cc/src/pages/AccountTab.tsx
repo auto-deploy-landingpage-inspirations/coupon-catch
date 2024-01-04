@@ -104,10 +104,10 @@ const AccountTab: React.FC = () => {
 
   const handleSignOut = () => {
     signOut(auth)
-      .then(() => {
+    .then(() => {
+        history.push('/auth');
         console.log("Sign-out successful.");
         // // Navigate to /auth route upon successful signout
-        // history.push('/auth');
         setToast({
           isOpen: true,
           message: "Successfully logged out",
@@ -162,10 +162,10 @@ const AccountTab: React.FC = () => {
                   slot="start"
                 ></IonIcon>
                 <IonLabel>
-                  <h1>{user.displayName}</h1>
+                  <h1>{user?.displayName}</h1>
                 </IonLabel>
                 <IonLabel>
-                  {user.emailVerified === false && (
+                  {user?.emailVerified === false && (
                     <IonBadge color="warning" slot="end">
                       Email unverified
                     </IonBadge>
@@ -183,7 +183,7 @@ const AccountTab: React.FC = () => {
           </IonItemGroup>
 
           <IonItemGroup>
-            {user.emailVerified === false && (
+            {user?.emailVerified === false && (
               <IonItem>
                 <IonLabel>
                   <h2>Email Unverified</h2>
@@ -256,7 +256,7 @@ const AccountTab: React.FC = () => {
 
         {/* Include the DemoAccountNotice component */}
         <Suspense>
-        <DemoUINotice uid={user.uid} />
+        <DemoUINotice uid={user?.uid} />
         </Suspense>
 
       </IonContent>
