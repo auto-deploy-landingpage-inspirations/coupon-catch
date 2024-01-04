@@ -18,22 +18,6 @@ const AuthPage: React.FC = () => {
       justifyContent: "flex-start", // align content to the top
       height: "100%",
     },
-    // logoImageWrapper: {
-    //   position: 'relative',
-    //   maxWidth: 700,
-    //   maxHeight: '50vh', // limit height to 50% of the viewport height
-    //   minWidth: 300,
-    //   width: '100%',
-    //   paddingTop: `${aspectRatio}%`, // set aspect ratio here
-    //   margin: '0 auto',
-    // },
-    // logoImage: {
-    //   position: 'absolute',
-    //   top: 0,
-    //   left: 0,
-    //   width: '100%',
-    //   height: '100%',
-    // },
     logoImage: {
       maxWidth: 700,
       minWidth: 300,
@@ -71,6 +55,7 @@ const AuthPage: React.FC = () => {
       />
       </div>
 
+      {/* Auth Container */}
       <div style={styles.authContainer}>
         {isLogin ? (
           <LoginComponent toggleLogin={() => setIsLogin(false)} />
@@ -79,8 +64,9 @@ const AuthPage: React.FC = () => {
         )}
       </div>
 
+      {/* Footer */}
       <IonText style={styles.footerText}>
-          &copy; {new Date().getFullYear()} Coupon Catch by Skypher LLC
+        &copy; {new Date().getFullYear()} Coupon Catch by Skypher LLC
       </IonText>
     </IonContent>
   );
