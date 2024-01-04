@@ -3,6 +3,8 @@ import { IonList } from '@ionic/react';
 import ReceiptItem from './ReceiptItem';
 import { IReceiptItem } from '../utils/types';
 import { useRef } from 'react';
+import { ReceiptStore } from '../utils/store';
+import LoadingPage from './LoadingPage';
 
 interface ReceiptListProps {
   receipts: IReceiptItem[];
@@ -19,9 +21,14 @@ const ReceiptList: React.FC<ReceiptListProps> = ({
   onPurchaseCouponUnlock,
   onDeleteReceipt,
 }) => {
+  const receiptsIsCalculated = ReceiptStore.useState(s => s.isCalculated); // Get the isCalculated state
     // const animatedItemRef = useRef<HTMLIonItemSlidingElement>(null);
 //  console.log("receipts at ReceiptList: ", receipts)
 //     console.log("ReceiptList component rendering");
+
+if (!receiptsIsCalculated) {
+  return <LoadingPage />;
+}
   return (
     <IonList>
       {receipts.map(receipt => (
