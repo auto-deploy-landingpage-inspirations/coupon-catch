@@ -29,6 +29,8 @@ import "../styles/EditProfilePageStyles.css";
 
 const EditProfilePage = () => {
   const user = AuthStore.useState((s) => s.user);
+  console.log('EditProfilePage rendered');
+
   return (
     <IonPage>
       <IonHeader>
@@ -80,16 +82,17 @@ const EditProfilePage = () => {
                   labelPlacement="stacked"
                   clearInput={true}
                   value={user.email}
+                  placeholder={user.email}
                 ></IonInput>
               </IonItem>
             )}
-
+{/* 
         <IonNote 
         color="medium" 
         class="ion-margin-horizontal"
         >
-          Invalid email
-        </IonNote>
+         Invalid email
+        </IonNote> */}
 
             <IonItem>
               <IonInput
