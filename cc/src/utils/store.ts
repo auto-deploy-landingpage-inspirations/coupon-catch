@@ -31,14 +31,14 @@ export const AuthStore = new Store<IAuthStore>({
 
 interface IReceiptStore {
   receiptList: IReceiptItem[];
-  isLoaded: boolean;
   isCalculated: boolean;
+  isSorted: boolean;
 }
 
 export const ReceiptStore = new Store<IReceiptStore>({
   receiptList: [],
-  isLoaded: false,
   isCalculated: false,
+  isSorted: false,
 });
 
 interface ICouponStore {
