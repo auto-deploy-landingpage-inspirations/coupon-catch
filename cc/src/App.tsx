@@ -457,9 +457,10 @@ const [isDemoCouponsApplied, setIsDemoCouponsApplied] = useState(false);
             to={uid ? "/dashboard/home" : "/auth"}
             exact={true}
           />
-          {/* This route catches all typed in urls that are not defined above and redirects to the auth page. */}
+          {/* This route catches all typed in urls that are not defined above and redirects to the auth page.*/}
           <Route
-            component={() => (uid ? <DashboardPage /> : <AuthPage />)}
+            path="*"
+            render={() => (uid ? <Redirect to="/dashboard/home" /> : <Redirect to="/auth" />)}
           />
         </IonRouterOutlet>
       </IonReactRouter>
