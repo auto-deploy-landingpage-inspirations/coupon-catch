@@ -68,7 +68,7 @@ const ReceiptDetailPage: React.FC = () => {
     async (firebaseUserId: string, receiptId: string) => {
       try {
         const response = await fetch(
-          "https://couponcatch-dev.eba-vp93mvht.us-east-1.elasticbeanstalk.com/create-checkout-session",
+          "https://api.couponcatchapp.com/create-checkout-session",
           {
             method: "POST",
             headers: {

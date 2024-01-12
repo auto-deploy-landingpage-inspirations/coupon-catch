@@ -89,7 +89,7 @@ const AddTab: React.FC = () => {
       const headers = new Headers();
       headers.set("Authorization", `Bearer ${idToken}`);
 
-      const response = await fetch("https://couponcatch-dev.eba-vp93mvht.us-east-1.elasticbeanstalk.com/upload", {
+      const response = await fetch("https://api.couponcatchapp.com/upload", {
         method: "POST",
         body: formData,
         headers: headers,
