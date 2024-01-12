@@ -68,7 +68,7 @@ const ReceiptDetailPage: React.FC = () => {
     async (firebaseUserId: string, receiptId: string) => {
       try {
         const response = await fetch(
-          "http://localhost:3001/create-checkout-session",
+          "http://couponcatch-dev.eba-vp93mvht.us-east-1.elasticbeanstalk.com/create-checkout-session",
           {
             method: "POST",
             headers: {
