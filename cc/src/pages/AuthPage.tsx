@@ -28,7 +28,7 @@ const AuthPage: React.FC = () => {
     authContainer: {
       maxWidth: 270,
       margin: "0 auto",
-      marginTop: "-40px",
+      marginTop: "-20px",
     },
     footerText: {
       display: "block",
@@ -48,7 +48,7 @@ const AuthPage: React.FC = () => {
       {/* Logo */}
       <div style={styles.logoImageWrapper}>
       <IonImg
-        src="v3.png"
+        src="logolight.webp"
         class="ion-padding"
         style={styles.logoImage}
         alt="A cartoon fish facing a hook where the fin undereneatht eh fish and the hook from the two C's to Coupon Catch in this logo"
