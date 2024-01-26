@@ -237,18 +237,18 @@ const [isDemoCouponsApplied, setIsDemoCouponsApplied] = useState(false);
     console.log("useEffect for Applying Coupons to demo user account, checking if isDemoUser, isReceiptsFetched and isCouponLoaded")
     if (!uid) return;
     if (isDemoUser && isReceiptsFetched && isCouponLoaded) {
-      // index of coupon to edit, days ago to set date of purchase, number of coupons to apply
-      alterDemoReceipt(0, 24, 3, couponList);
-      alterDemoReceipt(1, 10, 2, couponList);
-      alterDemoReceipt(2, 22, 1, couponList);
-      alterDemoReceipt(3, 0, 0, couponList);
+      // index of coupon to edit, days ago to set date of purchase, daysLeft to redeem, number of coupons to apply
+      alterDemoReceipt(0, 24, 12, 3, couponList);
+      alterDemoReceipt(1, 10, 12, 2, couponList);
+      alterDemoReceipt(2, 22, 12, 1, couponList);
+      alterDemoReceipt(3, 0, 12, 0, couponList);
 
       // set isDemoCouponsApplied to true pullstate in ReceiptStore
       setIsDemoCouponsApplied(true);
     }
   }, [isReceiptsFetched]);
 
-  // CalulateReceiptFeilds will fill in the daysLeft, unlockCouponTotal, and availCouponAmount fields on the returned receipts
+  // CalulateReceiptFields will fill in the daysLeft, unlockCouponTotal, and availCouponAmount fields on the returned receipts
   // Define the function to perform calculations
   const calculateReceiptFields = (receipts: IReceiptItem[]) => {
     if (!uid) return;
@@ -298,10 +298,14 @@ const [isDemoCouponsApplied, setIsDemoCouponsApplied] = useState(false);
         const index = s.receiptList.findIndex(storeReceipt => storeReceipt.id === receipt.id);
         if (index !== -1) {
           const unlockCouponTotal = s.receiptList[index].itemLines.reduce((total, itemLine) => total + Number(itemLine.availCouponAmount), 0);
-          const daysLeft = Math.max(0, Math.min(daysFromDoP, daysToCouponEnd));
 
           s.receiptList[index].unlockCouponTotal = unlockCouponTotal;
-          s.receiptList[index].daysLeft = daysLeft;
+
+          // Only calculate daysLeft for non-demo users
+          if (!isDemoUser) {
+            const daysLeft = Math.max(0, Math.min(daysFromDoP, daysToCouponEnd));
+            s.receiptList[index].daysLeft = daysLeft;
+          }
         }
       });
     });
@@ -329,6 +333,7 @@ const [isDemoCouponsApplied, setIsDemoCouponsApplied] = useState(false);
   const alterDemoReceipt = (
     receiptIndex: any,
     daysAgo: number,
+    daysLeft: number,
     numberOfCoupons: number = 0,
     couponList: typeof ICouponList
   ) => {
@@ -388,34 +393,12 @@ const [isDemoCouponsApplied, setIsDemoCouponsApplied] = useState(false);
         }
       });
 
-
-
-
-
-
-
-
-
-
-      // //This is done by picking the first "numberOfCoupons" items from the receipt's line items, and changing the item number and availCouponAmount to the selected coupon's item number and discount amount.
-      // ReceiptStore.update((s) => {
-      //   if (receiptIndex >= 0 && receiptIndex < s.receiptList.length) {
-      //     const receipt = s.receiptList[receiptIndex];
-
-      //     eligibleCoupons.forEach((coupon, index: number) => {
-      //       if (receipt.itemLines && receipt.itemLines.length > index) {
-      //         const itemLine = receipt.itemLines[index];
-
-      //         // Update item number and coupon amount
-      //         itemLine.itemNumber = Number(coupon.itemNumber);
-      //         itemLine.availCouponAmount = Number(coupon.discount);
-
-      //         // Check if the item line was updated
-      //         console.log(`Updated item line ${index}:`, itemLine);
-      //       }
-      //     });
-      //   }
-      // });
+        // Set daysLeft for the receipt
+  ReceiptStore.update((s) => {
+    if (receiptIndex >= 0 && receiptIndex < s.receiptList.length) {
+      s.receiptList[receiptIndex].daysLeft = daysLeft;
+    }
+  });
     }
   };
 
