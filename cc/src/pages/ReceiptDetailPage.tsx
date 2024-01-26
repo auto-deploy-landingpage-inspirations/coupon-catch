@@ -260,7 +260,11 @@ const ReceiptDetailPage: React.FC = () => {
                       if (receiptIndex !== -1) {
                         s.receiptList[receiptIndex].isRedeemed = true;
                       }
-                      history.push("/dashboard/home");
+                      //remove the receipt from the local store
+                      s.receiptList = s.receiptList.filter(
+                        (r) => r.id !== receiptId
+                      );
+                      history.push("/dashboard");
                     });
                   } else {
                     // mark items as redeemed in firestore
