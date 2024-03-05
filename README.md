@@ -1,61 +1,75 @@
-stripe triggers
+# Coupon Catch (mobile app)
+Write a short sentence or two about this project and what it does. Be sure to include a link and a screenshot (we're front end devs so we can actually see our work!).
 
-Webhooks are an essential part of handling asynchronous events in Stripe. When certain events occur in your Stripe account, Stripe can send webhook events to a specified endpoint in your application. These events can be used to update the state in your system, like changing a user's subscription status. Here’s an overview of some key webhook events related to subscriptions and payments, and which ones might be most relevant for setting a "paying user" state:
+**Link to project:** http://recruiters-love-seeing-live-demos.com/
 
-1. checkout.session.completed
-Triggered When: A Checkout Session is successfully completed.
-Use Case: This is a crucial event for subscriptions made via Stripe Checkout. When you receive this event, you can update the user's status to "paying" or "active" in your system. It's especially important because it indicates that the payment process has been successfully completed.
-2. invoice.payment_succeeded
-Triggered When: A payment against an invoice is successful.
-Use Case: This event is important for ongoing subscription payments. It's triggered every billing cycle when a payment is successfully made. Use this event to confirm ongoing active subscription status.
-3. invoice.payment_failed
-Triggered When: A payment against an invoice fails.
-Use Case: This event helps in handling failed payments. When you receive this, you might want to update the user's status to "past due" or "inactive," and potentially initiate contact with the user for payment resolution.
-4. customer.subscription.created
-Triggered When: A new subscription is created for a customer.
-Use Case: Useful if you want to track the creation of new subscriptions, but it does not indicate payment completion.
-5. customer.subscription.updated
-Triggered When: A subscription is updated (e.g., changing plans, pausing subscription).
-Use Case: Use this to track changes to a user's subscription and update their status or features accordingly in your app.
-6. customer.subscription.deleted
-Triggered When: A subscription is canceled or ends.
-Use Case: This is crucial to set a user’s status to "non-paying" or "canceled" in your system.
-7. customer.deleted
-Triggered When: A customer is deleted from your Stripe account.
-Use Case: If you're linking Stripe customers directly to user accounts, use this to clean up or update the corresponding user data in your system.
-Choosing the Right Webhook Events
-The specific webhook events you should handle depend on your application's logic and the user experience you want to provide. For managing a "paying user" state, the most critical events are typically:
+![alt tag](http://placecorgi.com/1200/650)
 
-checkout.session.completed: For initially setting the user as a paying customer after they complete the checkout process.
-invoice.payment_succeeded and invoice.payment_failed: For managing ongoing subscription status, especially in scenarios where the subscription involves recurring payments.
-Remember to verify webhook events using your endpoint’s secret, and test your webhook handling thoroughly to ensure it behaves as expected under different scenarios. This will ensure that your application responds correctly to changes in subscription status and maintains accurate records of user states.
+## How It's Made:
+
+**Tech used:**
+![JavaScript](https://img.shields.io/badge/-JavaScript-black?style=for-the-badge&logo=javascript)
+![TypeScript](https://img.shields.io/badge/-TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/-React-black?style=for-the-badge&logo=react)
+![Redux](https://img.shields.io/badge/-Redux-593D88?style=for-the-badge&logo=redux)
+![ReactReduxSaga](https://img.shields.io/badge/Redux%20saga-86D46B?style=for-the-badge&logo=redux%20saga&logoColor=999999)
+![Next.js](https://img.shields.io/badge/-Next.js-000000?style=for-the-badge&logo=nextdotjs)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![StyledComponents](https://img.shields.io/badge/Styled--Components-DB7093?style=for-the-badge&logo=styled-components&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white)
+![HTML5](https://img.shields.io/badge/-HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/-CSS3-1572B6?style=for-the-badge&logo=css3)
+![ReactNative](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react)
+![Ionic](https://img.shields.io/badge/Ionic-3880FF?style=for-the-badge&logo=ionic&logoColor=white)
+![Capacitor](https://img.shields.io/badge/Capacitor-119EFF?style=for-the-badge&logo=Capacitor&logoColor=white)
+![Jest](https://img.shields.io/badge/Jest-323330?style=for-the-badge&logo=Jest&logoColor=white)
+![Cypress](https://img.shields.io/badge/Cypress-17202C?style=for-the-badge&logo=cypress&logoColor=white)
+![Chai](https://img.shields.io/badge/chai-A30701?style=for-the-badge&logo=chai&logoColor=white)
+![Nodejs](https://img.shields.io/badge/-Nodejs-black?style=for-the-badge&logo=Node.js)
+![Express](https://img.shields.io/badge/-Express.js-404D59?style=for-the-badge&logo=Express)
+![MongoDB](https://img.shields.io/badge/-MongoDB-black?style=for-the-badge&logo=mongodb)
+![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white)
+![GraphQL](https://img.shields.io/badge/-GraphQL-E10098?style=for-the-badge&logo=graphql)
+![Apollo GraphQL](https://img.shields.io/badge/-Apollo%20GraphQL-311C87?style=for-the-badge&logo=apollo-graphql)
+![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-336791?style=for-the-badge&logo=postgresql)
+![Docker](https://img.shields.io/badge/-Docker-black?style=for-the-badge&logo=docker)
+![MySQL](https://img.shields.io/badge/-MySQL-black?style=for-the-badge&logo=mysql)
+![Heroku](https://img.shields.io/badge/-Heroku-430098?style=for-the-badge&logo=heroku)
+![Amazon AWS](https://img.shields.io/badge/Amazon%20AWS-232F3E?style=for-the-badge&logo=amazon-aws)
+![Firebase](https://img.shields.io/badge/Firebase-232F7E?style=for-the-badge&logo=firebase)
+![Google Cloud](https://img.shields.io/badge/Google%20Cloud-black?style=for-the-badge&logo=google-cloud)
+![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
+![NPM](https://img.shields.io/badge/NPM-CB3837?style=for-the-badge&logo=npm&logoColor=white)
+![PNPM](https://img.shields.io/badge/PNPM-yellow?style=for-the-badge&logo=pnpm&logoColor=white)
+![Yarn](https://img.shields.io/badge/Yarn-2C8EBB?style=for-the-badge&logo=yarn&logoColor=white)
+![Git](https://img.shields.io/badge/-Git-black?style=for-the-badge&logo=git)
+![GitHub](https://img.shields.io/badge/-GitHub-181717?style=for-the-badge&logo=github)
+![ESLint](https://img.shields.io/badge/ESLint-3A33D1?style=for-the-badge&logo=eslint&logoColor=white)
+![Postman](https://img.shields.io/badge/Postman-FF6C37?style=flatsquare&logo=Postman&logoColor=white)
+![Prettier](https://img.shields.io/badge/Prettier-1A2C34?style=for-the-badge&logo=prettier&logoColor=F7BA3E)
+![JSON](https://img.shields.io/badge/JSON-5E5C5C?style=for-the-badge&logo=json&logoColor=white)
+![VSCode](https://img.shields.io/badge/VSCode-0078D4?style=for-the-badge&logo=visual%20studio%20code&logoColor=white)
+![Stripe](https://img.shields.io/badge/Stripe-626CD9?style=for-the-badge&logo=Stripe)
+
+Here's where you can go to town on how you actually built this thing. Write as much as you can here, it's totally fine if it's not too much just make sure you write *something*. If you don't have too much experience on your resume working on the front end that's totally fine. This is where you can really show off your passion and make up for that ten fold.
+
+## Optimizations
+*(optional)*
+
+You don't have to include this section but interviewers *love* that you can not only deliver a final product that looks great but also functions efficiently. Did you write something then refactor it later and the result was 5x faster than the original implementation? Did you cache your assets? Things that you write in this section are **GREAT** to bring up in interviews and you can use this section as reference when studying for technical interviews!
+
+## Lessons Learned:
+
+No matter what your experience level, being an engineer means continuously learning. Every time you build something you always have those *whoa this is awesome* or *wow I actually did it!* moments. This is where you should share those moments! Recruiters and interviewers love to see that you're self-aware and passionate about growing.
+
+## Examples:
+Take a look at these couple examples that I have in my own portfolio:
+
+**Palettable:** https://github.com/alecortega/palettable
+
+**Twitter Battle:** https://github.com/alecortega/twitter-battle
+
+**Patch Panel:** https://github.com/alecortega/patch-panel
 
 
 
-
-For managing a subscription model and keeping track of which users are paid or in good standing, you should focus on a set of specific webhook events that are directly related to subscriptions and their payment statuses. Here are the key events:
-
-1. customer.subscription.created
-Triggered When: A new subscription is created.
-Use Case: Indicates that a user has initiated a subscription. However, this does not necessarily imply successful payment, so it's not a definitive indicator of a "paying" user.
-2. invoice.payment_succeeded
-Triggered When: A payment for a subscription invoice succeeds.
-Use Case: This is crucial for identifying "paying" users. A successful invoice payment typically means the user's subscription is active and in good standing. It's essential for both initial payments and recurring billing cycles.
-3. invoice.payment_failed
-Triggered When: A payment for a subscription invoice fails.
-Use Case: Important for identifying users whose payments have failed. This might put their account in a "past due" or "suspended" state, depending on your business logic. You may want to reach out to these users to update their payment methods or resolve billing issues.
-4. customer.subscription.updated
-Triggered When: There are any updates to a subscription (e.g., plan changes, pauses, or resumptions).
-Use Case: Useful for tracking changes in subscription status, like upgrades, downgrades, or pauses, which might affect the user's standing or access to services.
-5. customer.subscription.deleted
-Triggered When: A subscription is canceled or ends.
-Use Case: Essential for identifying when a user's subscription has been canceled or has expired. This event marks a user as no longer in good standing as a paying subscriber.
-6. checkout.session.completed (Optional, Depending on Setup)
-Triggered When: A Checkout Session is completed successfully.
-Use Case: If you use Stripe Checkout to set up subscriptions, this event is also relevant. It indicates a successful setup of a subscription through Stripe's Checkout process.
-Implementation Tips:
-Webhook Endpoint Security: Secure your webhook endpoint and validate the events using Stripe’s signing secret.
-Database Updates: Update the user's subscription status in your database in response to these webhook events.
-Error Handling: Implement robust error handling and logging to capture any issues that occur during webhook processing.
-Testing: Use Stripe's test mode to simulate different subscription scenarios and ensure your system responds correctly.
-By focusing on these webhook events, you can effectively manage user subscription statuses, ensuring that you have accurate and up-to-date information on who is a paying user and who is in good standing.
