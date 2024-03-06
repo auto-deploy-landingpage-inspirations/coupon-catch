@@ -48,11 +48,11 @@ The development of Coupon Catch was driven by the goal to provide an efficient a
 
 ## Optimizations
 
-*Cloud Vision API replaced with Google Cloud Document AI for more efficient OCR handling
-*Lookahead and Lookbehind to reduce regex algorithm run time
-*Stripe webhook triggers for user auth
-*Firebase auth, storage, and database to reduce time to market
-*Postman utilized to reduce API endpoint debugging
+* Cloud Vision API replaced with Google Cloud Document AI for more efficient OCR handling
+* Lookahead and Lookbehind to reduce regex algorithm run time
+* Stripe webhook triggers for user auth
+* Firebase auth, storage, and database to reduce time to market
+* Postman utilized to reduce API endpoint debugging
 
 ## Lessons Learned:
 
