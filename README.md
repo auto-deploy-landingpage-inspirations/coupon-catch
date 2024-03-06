@@ -1,13 +1,19 @@
 # Coupon Catch (mobile app)
-Write a short sentence or two about this project and what it does. Be sure to include a link and a screenshot (we're front end devs so we can actually see our work!).
+Coupon Catch is a comprehensive full-stack mobile application that integrates a sleek Ionic React frontend with a powerful Node Express backend. This app harnesses Stripe for payment processing and utilizes advanced OCR technology for text recognition, aiming to simplify and enhance the couponing experience for users.
 
-**Link to project:** http://recruiters-love-seeing-live-demos.com/
+**Link to project:** http://app.couponcatchapp.com/
 
-![alt tag](http://placecorgi.com/1200/650)
+**Login to demo account with:** 
+  User: demo@demo.com Password: Demodemo12!
 
-## How It's Made:
+<div align="center">
+  <a href="https://github.com/othneildrew/Best-README-Template">
+    <img src="https://github.com/kdten/kdten/blob/main/ccapppreview.gif?raw=true" alt="Logo">
+  </a>
+</div>
 
-**Tech used:**
+## Built with:
+
 ![JavaScript](https://img.shields.io/badge/-JavaScript-black?style=for-the-badge&logo=javascript)
 ![TypeScript](https://img.shields.io/badge/-TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/-React-black?style=for-the-badge&logo=react)
@@ -22,26 +28,13 @@ Write a short sentence or two about this project and what it does. Be sure to in
 ![ReactNative](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react)
 ![Ionic](https://img.shields.io/badge/Ionic-3880FF?style=for-the-badge&logo=ionic&logoColor=white)
 ![Capacitor](https://img.shields.io/badge/Capacitor-119EFF?style=for-the-badge&logo=Capacitor&logoColor=white)
-![Jest](https://img.shields.io/badge/Jest-323330?style=for-the-badge&logo=Jest&logoColor=white)
 ![Cypress](https://img.shields.io/badge/Cypress-17202C?style=for-the-badge&logo=cypress&logoColor=white)
-![Chai](https://img.shields.io/badge/chai-A30701?style=for-the-badge&logo=chai&logoColor=white)
 ![Nodejs](https://img.shields.io/badge/-Nodejs-black?style=for-the-badge&logo=Node.js)
 ![Express](https://img.shields.io/badge/-Express.js-404D59?style=for-the-badge&logo=Express)
-![MongoDB](https://img.shields.io/badge/-MongoDB-black?style=for-the-badge&logo=mongodb)
-![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white)
-![GraphQL](https://img.shields.io/badge/-GraphQL-E10098?style=for-the-badge&logo=graphql)
-![Apollo GraphQL](https://img.shields.io/badge/-Apollo%20GraphQL-311C87?style=for-the-badge&logo=apollo-graphql)
-![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-336791?style=for-the-badge&logo=postgresql)
-![Docker](https://img.shields.io/badge/-Docker-black?style=for-the-badge&logo=docker)
-![MySQL](https://img.shields.io/badge/-MySQL-black?style=for-the-badge&logo=mysql)
-![Heroku](https://img.shields.io/badge/-Heroku-430098?style=for-the-badge&logo=heroku)
 ![Amazon AWS](https://img.shields.io/badge/Amazon%20AWS-232F3E?style=for-the-badge&logo=amazon-aws)
 ![Firebase](https://img.shields.io/badge/Firebase-232F7E?style=for-the-badge&logo=firebase)
 ![Google Cloud](https://img.shields.io/badge/Google%20Cloud-black?style=for-the-badge&logo=google-cloud)
-![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
 ![NPM](https://img.shields.io/badge/NPM-CB3837?style=for-the-badge&logo=npm&logoColor=white)
-![PNPM](https://img.shields.io/badge/PNPM-yellow?style=for-the-badge&logo=pnpm&logoColor=white)
-![Yarn](https://img.shields.io/badge/Yarn-2C8EBB?style=for-the-badge&logo=yarn&logoColor=white)
 ![Git](https://img.shields.io/badge/-Git-black?style=for-the-badge&logo=git)
 ![GitHub](https://img.shields.io/badge/-GitHub-181717?style=for-the-badge&logo=github)
 ![ESLint](https://img.shields.io/badge/ESLint-3A33D1?style=for-the-badge&logo=eslint&logoColor=white)
@@ -51,25 +44,16 @@ Write a short sentence or two about this project and what it does. Be sure to in
 ![VSCode](https://img.shields.io/badge/VSCode-0078D4?style=for-the-badge&logo=visual%20studio%20code&logoColor=white)
 ![Stripe](https://img.shields.io/badge/Stripe-626CD9?style=for-the-badge&logo=Stripe)
 
-Here's where you can go to town on how you actually built this thing. Write as much as you can here, it's totally fine if it's not too much just make sure you write *something*. If you don't have too much experience on your resume working on the front end that's totally fine. This is where you can really show off your passion and make up for that ten fold.
+The development of Coupon Catch was driven by the goal to provide an efficient and user-friendly platform for managing coupons. By choosing Ionic React, we were able to significantly reduce development costs and streamline the app's availability across both Apple and Android platforms. Our adoption of Google Cloud's Document AI for OCR processing and Firebase for authentication, database, and storage solutions not only improved the app's performance but also expedited our time-to-market.
 
 ## Optimizations
-*(optional)*
 
-You don't have to include this section but interviewers *love* that you can not only deliver a final product that looks great but also functions efficiently. Did you write something then refactor it later and the result was 5x faster than the original implementation? Did you cache your assets? Things that you write in this section are **GREAT** to bring up in interviews and you can use this section as reference when studying for technical interviews!
+*Cloud Vision API replaced with Google Cloud Document AI for more efficient OCR handling
+*Lookahead and Lookbehind to reduce regex algorithm run time
+*Stripe webhook triggers for user auth
+*Firebase auth, storage, and database to reduce time to market
+*Postman utilized to reduce API endpoint debugging
 
 ## Lessons Learned:
 
-No matter what your experience level, being an engineer means continuously learning. Every time you build something you always have those *whoa this is awesome* or *wow I actually did it!* moments. This is where you should share those moments! Recruiters and interviewers love to see that you're self-aware and passionate about growing.
-
-## Examples:
-Take a look at these couple examples that I have in my own portfolio:
-
-**Palettable:** https://github.com/alecortega/palettable
-
-**Twitter Battle:** https://github.com/alecortega/twitter-battle
-
-**Patch Panel:** https://github.com/alecortega/patch-panel
-
-
-
+This project was a significant learning experience, deepening our understanding of mobile app development and the integration of native device features. It highlighted the importance of selecting the right tools and technologies to meet project goals effectively. Looking forward, we may explore upgrading the server architecture to Go (Golang) to further improve backend efficiency.
