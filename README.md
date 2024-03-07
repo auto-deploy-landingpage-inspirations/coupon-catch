@@ -1,5 +1,5 @@
 # Coupon Catch (mobile app)
-Coupon Catch is a comprehensive full-stack mobile application that integrates a sleek Ionic React frontend with a powerful Node Express backend. This app harnesses Stripe for payment processing and utilizes advanced OCR technology for text recognition, aiming to simplify and enhance the couponing experience for users.
+Coupon Catch is a comprehensive full-stack mobile application that integrates a sleek Ionic/Capactior.js React frontend with a powerful Node Express backend. This app harnesses Stripe for payment processing and utilizes advanced OCR technology for text recognition, aiming to simplify and enhance the couponing experience for users.
 
 **Link to project:** http://app.couponcatchapp.com/
 
